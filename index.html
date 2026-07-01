@@ -56,6 +56,19 @@
             background: linear-gradient(135deg, #4caf50, #2e7d32);
         }
 
+        /* Nút xóa dữ liệu túi đồ */
+        .btn-reset-data {
+            background: linear-gradient(135deg, #c62828, #ef5350);
+            border: 1px solid #b71c1c;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .btn-reset-data:hover {
+            background: linear-gradient(135deg, #ef5350, #c62828);
+        }
+
         /* ================= HOẠT ẢNH NỔ GACHA ================= */
         .gacha-screen, .inventory-screen {
             display: none; 
@@ -71,7 +84,7 @@
         .flash-blue {
             animation: animationXanh 0.6s ease-out forwards;
         }
-        /* 4★ MỚI: Chớp sáng tím lãng mạn quý phái */
+        /* 4★: Chớp sáng tím lãng mạn quý phái */
         .flash-purple {
             animation: animationTim 0.8s ease-out forwards;
         }
@@ -175,43 +188,43 @@
         <button onclick="quayGacha(10)">Quay x10</button>
     </div>
 
-    <!-- NÚT MỚI: Xem túi đồ -->
+    <!-- Đã cập nhật nút Xem Túi Đồ -->
     <div class="button-group">
-        <button class="btn-inventory" onclick="moTuiDo()">Check Inventory</button>
+        <button class="btn-inventory" onclick="moTuiDo()">inventory-box</button>
     </div>
 
-    <!-- Màn hình hiệu ứng gacha -->
+    <!-- Đã cập nhật nút đóng màn hình thành "Bỏ qua" -->
     <div id="screen-gacha" class="gacha-screen">
         <div id="text-result" class="item-result"></div>
         <button class="btn-close" onclick="dongManHinh()">Skip</button>
     </div>
 
-    <!-- MÀN HÌNH TÚI ĐỒ -->
+    <!-- MÀN HÌNH TÚI ĐỒ (Đã cập nhật nút "Đóng túi" và thêm nút "Xóa dữ liệu") -->
     <div id="screen-inventory" class="inventory-screen">
         <div class="inventory-box">
             <h2 class="inventory-title">KHO VẬT PHẨM ĐÃ QUAY</h2>
             <div id="inventory-list" class="inventory-list"></div>
             <div style="text-align: center;">
                 <button class="btn-close" style="opacity: 1; animation: none;" onclick="dongTuiDo()">Close</button>
+                <br>
+                <button class="btn-reset-data" onclick="xoaDuLieuTuiDo()">🗑️ Reset</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Kho dữ liệu vật phẩm giữ nguyên của bạn
         const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Lọ Mọ", "★5 Bao Cao Su", "★5 Kiều Lương tâm"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Coăn Bọa"]; 
-        const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Rượu Kích Dục Của Mẹ Lý", "★3 Lá Chanh", "★3 Cứt"];
+        const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Cứt"];
 
-        // Biến lưu trữ vật phẩm trong túi đồ
-        let tuiDo = {};
+        // Hệ thống tự nạp dữ liệu cũ từ trình duyệt
+        let tuiDo = JSON.parse(localStorage.getItem('saygex_inventory')) || {};
 
         const manHinhGacha = document.getElementById('screen-gacha');
         const vungHienThiChu = document.getElementById('text-result');
         const manHinhTuiDo = document.getElementById('screen-inventory');
         const vungDanhSachTui = document.getElementById('inventory-list');
 
-        // Hàm tính toán tỉ lệ ngẫu nhiên 0.5%
         function rollItem() {
             let mayMan = Math.random() * 100; 
             
@@ -234,7 +247,6 @@
             for (let i = 0; i < soLuot; i++) {
                 let ketQuaRoll = rollItem();
                 
-                // CẬP NHẬT TÚI ĐỒ: Nếu có rồi thì tăng số lượng, chưa có thì thêm mới
                 if (tuiDo[ketQuaRoll.name]) {
                     tuiDo[ketQuaRoll.name].count += 1;
                 } else {
@@ -254,6 +266,9 @@
                 }
             }
 
+            // Tự động lưu túi đồ vào trình duyệt sau khi quay
+            localStorage.setItem('saygex_inventory', JSON.stringify(tuiDo));
+
             manHinhGacha.className = "gacha-screen"; 
             if (doHiemCaoNhat === 5) {
                 manHinhGacha.classList.add('flash-gold'); 
@@ -267,7 +282,6 @@
             manHinhGacha.style.display = 'flex';
         }
 
-        // Hàm xử lý mở giao diện túi đồ
         function moTuiDo() {
             vungDanhSachTui.innerHTML = ''; 
             
@@ -290,6 +304,15 @@
                 }
             }
             manHinhTuiDo.style.display = 'flex';
+        }
+
+        function xoaDuLieuTuiDo() {
+            if (confirm("Bạn có chắc chắn muốn xóa sạch túi đồ hiện tại không?")) {
+                localStorage.removeItem('saygex_inventory');
+                tuiDo = {};
+                moTuiDo();
+                alert("Đã xóa sạch túi đồ thành công!");
+            }
         }
 
         function dongTuiDo() {
