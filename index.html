@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>SAY GEX GACHA - GENSHIN STYLE V7</title>
+    <style>
+        body {
+            background-image: url('nanachi.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #ffd700;
+            font-size: 2.6em;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+            margin-bottom: 10px;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        .banner-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            max-width: 95%;
+        }
+        .btn-tab {
+            padding: 10px 16px;
+            font-size: 0.95em;
+            cursor: pointer;
+            background: #252530;
+            color: #aaa;
+            border: 1px solid #3a3a4a;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .btn-tab:hover {
+            color: white;
+            background: #353545;
+        }
+        .btn-tab.active {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #111;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+
+        .pity-counter {
+            background: rgba(26, 26, 36, 0.85);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border: 1px solid #333;
+            color: #ccc;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 15px 35px;
+            font-size: 1.3em;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4c2c69, #7a4f9a);
+            color: white;
+            border: 2px solid #5a3a79;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #7a4f9a, #4c2c69);
+            transform: translateY(-4px);
+        }
+
+        .btn-inventory {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            border: 2px solid #388e3c;
+        }
+        .btn-inventory:hover {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+        }
+
+        .btn-reset-data {
+            background: linear-gradient(135deg, #c62828, #ef5350);
+            border: 1px solid #b71c1c;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .btn-reset-data:hover {
+            background: linear-gradient(135deg, #ef5350, #c62828);
+        }
+
+        .gacha-screen, .inventory-screen {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 99;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .flash-blue { animation: animationXanh 0.6s ease-out forwards; }
+        .flash-purple { animation: animationTim 0.8s ease-out forwards; }
+        .flash-gold { animation: animationVang 1s ease-out forwards; }
+
+        @keyframes animationXanh {
+            0% { background-color: #ffffff; box-shadow: inset 0 0 100px #00a2ff; }
+            40% { background-color: #0044ff; }
+            100% { background-color: rgba(10, 10, 15, 0.95); }
+        }
+        @keyframes animationTim {
+            0% { background-color: #ffffff; box-shadow: inset 0 0 100px #cc00ff; }
+            40% { background-color: #9900cc; }
+            100% { background-color: rgba(12, 5, 18, 0.96); }
+        }
+        @keyframes animationVang {
+            0% { background-color: #ffffff; box-shadow: inset 0 0 100px #ffcc00; }
+            45% { background-color: #ffaa00; }
+            100% { background-color: rgba(15, 10, 5, 0.97); }
+        }
+
+        .char-splash-container {
+            display: none;
+            width: auto;
+            height: 32vh;  /* Tối ưu chiều cao để vừa khít cả ảnh to lẫn hàng thẻ bên dưới */
+            margin-bottom: 10px;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .char-splash-img {
+            height: 100%;
+            max-width: 90vw;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0.6) rotate(-3deg);
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6));
+            animation: xuatHienSplash 0.6s 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+        @keyframes xuatHienSplash {
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        /* KHU VỰC CHỨA CÁC THẺ CARD GACHA DÀN HÀNG NGANG */
+        .item-result {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px 20px;
+            width: 95vw;
+            max-width: 1400px;
+            overflow: visible;
+            padding: 10px;
+        }
+
+        /* 🌟 CSS CHO TỪNG THẺ VẬT PHẨM XUẤT HIỆN TỪ TỪ 🌟 */
+        .gacha-card {
+            width: 120px;
+            height: 190px;
+            border-radius: 8px 8px 0 8px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+            background: #1e1e24;
+            
+            /* Trạng thái ẩn ban đầu để chờ chạy hiệu ứng xuất hiện từ từ */
+            opacity: 0;
+            transform: translateY(40px) scale(0.5);
+            animation: cardPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+
+        @keyframes cardPopIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Khung chứa hình ảnh của vật phẩm trong thẻ */
+        .card-img-box {
+            width: 100%;
+            height: 135px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .card-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Tên hiển thị phía dưới chân thẻ */
+        .card-name {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            padding: 6px 3px;
+            width: 100%;
+            background: rgba(15, 15, 20, 0.85);
+            box-sizing: border-box;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* Màu nền phân loại theo độ hiếm chuẩn Genshin */
+        .rarity-5 {
+            background: linear-gradient(180deg, #4a3c31, #b58543);
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .rarity-4 {
+            background: linear-gradient(180deg, #38314a, #845396);
+            border: 2px solid #e100ff;
+            box-shadow: 0 0 15px rgba(225, 0, 255, 0.3);
+        }
+        .rarity-3 {
+            background: linear-gradient(180deg, #2c3945, #517187);
+            border: 1px solid #00ccff;
+        }
+
+        /* Nút Đóng / Skip */
+        .btn-close {
+            margin-top: 15px;
+            padding: 10px 40px;
+            font-size: 1.1em;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            /* Xuất hiện sau khi chiếc thẻ cuối cùng của x10 đáp xuống xong xuôi */
+            animation: hienNutSkip 0.4s 2.8s ease-out forwards;
+        }
+        @keyframes hienNutSkip { to { opacity: 1; } }
+
+        .inventory-screen {
+            background-color: rgba(10, 10, 15, 0.98);
+            z-index: 100;
+        }
+        .inventory-box {
+            width: 80%;
+            max-width: 600px;
+            background: #1a1a24;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        }
+        .inventory-title {
+            color: #ffcc00;
+            font-size: 2em;
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .inventory-list {
+            max-height: 350px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding-right: 10px;
+        }
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3em;
+            font-weight: bold;
+            padding: 10px;
+            border-bottom: 1px solid #2a2a3a;
+        }
+        .inventory-list::-webkit-scrollbar { width: 8px; }
+        .inventory-list::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1 id="banner-title">BANNER NGUYỄN MINH CƯỜNG</h1>
+    
+    <div class="banner-tabs">
+        <button class="btn-tab active" onclick="doiBanner('cuong', this)">M.Cường</button>
+        <button class="btn-tab" onclick="doiBanner('doom', this)">Doom Mixing</button>
+        <button class="btn-tab" onclick="doiBanner('boan', this)">Coăn Bọa</button>
+        <button class="btn-tab" onclick="doiBanner('kieuluong', this)">K.Lương tâm</button>
+        <button class="btn-tab" onclick="doiBanner('ducanh', this)">Phạm Đức Anh</button>
+    </div>
+
+    <div class="pity-counter">
+        Pity 5★: <span id="pity-num" style="color: #ffd700; font-weight: bold;">0</span>/90 
+        <span id="guarantee-status" style="margin-left: 10px; font-size: 0.9em; font-weight: bold;"></span>
+    </div>
+
+    <div class="button-group">
+        <button onclick="quayGacha(1)">Quay x1</button>
+        <button onclick="quayGacha(10)">Quay x10</button>
+    </div>
+
+    <div class="button-group">
+        <button class="btn-inventory" onclick="moTuiDo()">Inventory (Phím G)</button>
+    </div>
+
+    <div id="screen-gacha" class="gacha-screen">
+        <div id="char-splash-area" class="char-splash-container">
+            <img id="char-splash-img" class="char-splash-img" src="" alt="Splash Art">
+        </div>
+        <div id="text-result" class="item-result"></div>
+        <button id="btn-skip-gacha" class="btn-close" onclick="dongManHinh()">Skip (Phím E)</button>
+    </div>
+
+    <div id="screen-inventory" class="inventory-screen">
+        <div class="inventory-box">
+            <h2 class="inventory-title">KHO VẬT PHẨM ĐÃ QUAY</h2>
+            <div id="inventory-list" class="inventory-list"></div>
+            <div style="text-align: center;">
+                <button class="btn-close" style="opacity: 1; animation: none;" onclick="dongTuiDo()">Close</button>
+                <br>
+                <button class="btn-reset-data" onclick="xoaDuLieuTuiDo()">🗑️ Reset Toàn Bộ Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh"];
+        const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
+        const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
+
+        const dataBanners = {
+            cuong: { name: "Nguyễn Minh Cường", featured5Star: "★5 Nguyễn Minh Cường" },
+            doom: { name: "Doom Mixing", featured5Star: "★5 Doom Mixing" },
+            boan: { name: "Coăn Bọa", featured5Star: "★5 Coăn Bọa" },
+            kieuluong: { name: "Kiều Lương tâm", featured5Star: "★5 Kiều Lương tâm" },
+            ducanh: { name: "Phạm Đức Anh", featured5Star: "★5 Phạm Đức Anh" }
+        };
+
+        /* 🌟 THƯ VIỆN ĐƯỜNG DẪN ẢNH CHO TỪNG VẬT PHẨM CỤ THỂ 🌟 */
+        const hinhAnhVatPham = {
+            // Ảnh 5 Sao
+            "★5 Nguyễn Minh Cường": "cuong.jpg",
+            "★5 Doom Mixing": "doom.webp",
+            "★5 Coăn Bọa": "boan.webp",
+            "★5 Kiều Lương tâm": "kieuluong.png",
+            "★5 Phạm Đức Anh": "ducanh.png",
+            
+            // Ảnh 4 Sao
+            "★4 Ốp Điện Thoại": "op_dienthoai.png",
+            "★4 Lốp": "lop.png",
+            "★4 Ma Dog": "madog.png",
+            "★4 Khô Gà": "khoga.png",
+            
+            // Ảnh 3 Sao
+            "★3 Fat Nigger": "fat.png",
+            "★3 Warter Melon": "watermelon.png",
+            "★3 Bã Mía": "bamia.png",
+            "★3 Lá Chanh": "lachanh.png",
+            "★3 Nguyễn Minh Phương": "phuong.png"
+        };
+
+        let currentBanner = 'cuong'; 
+
+        let tuiDo = JSON.parse(localStorage.getItem('saygex_inventory')) || {};
+        let pityCount = parseInt(localStorage.getItem('saygex_pity')) || 0;
+        let isGuaranteed = localStorage.getItem('saygex_guaranteed') === 'true';
+
+        const manHinhGacha = document.getElementById('screen-gacha');
+        const vungHienThiChu = document.getElementById('text-result');
+        const manHinhTuiDo = document.getElementById('screen-inventory');
+        const vungDanhSachTui = document.getElementById('inventory-list');
+        
+        const vungKhungAnh5Sao = document.getElementById('char-splash-area');
+        const theAnh5Sao = document.getElementById('char-splash-img');
+        const nutSkipGacha = document.getElementById('btn-skip-gacha');
+
+        function amThanh(fileMpO) {
+            let audio = new Audio(fileMpO);
+            audio.play().catch(e => {
+                console.log("Thông báo âm thanh: Cần tương tác trước hoặc thiếu file " + fileMpO);
+            });
+        }
+
+        function updatePityUI() {
+            document.getElementById('pity-num').innerText = pityCount;
+            const statusLabel = document.getElementById('guarantee-status');
+            if (isGuaranteed) {
+                statusLabel.innerText = "[Không Nổ Thì Dev Chịu Rồi con]";
+                statusLabel.style.color = "#4caf50";
+            } else {
+                statusLabel.innerText = "[Tỷ lệ 36/64]";
+                statusLabel.style.color = "#ef5350";
+            }
+        }
+
+        function doiBanner(keyBanner, elementNut) {
+            amThanh('click.mp3'); 
+            currentBanner = keyBanner;
+            document.getElementById('banner-title').innerText = "BANNER " + dataBanners[keyBanner].name.toUpperCase();
+            let tatCaTabs = document.querySelectorAll('.btn-tab');
+            tatCaTabs.forEach(tab => tab.classList.remove('active'));
+            elementNut.classList.add('active');
+        }
+
+        function rollItem() {
+            pityCount++; 
+            let nolo5Sao = false;
+            let ngauNhien = Math.random() * 100;
+
+            if (pityCount >= 90 || ngauNhien <= 0.5) {
+                nolo5Sao = true;
+            }
+
+            if (nolo5Sao) {
+                pityCount = 0; 
+                let tenNhanVatNhanDuoc = "";
+                let bannerHienTai = dataBanners[currentBanner];
+
+                if (isGuaranteed || Math.random() * 100 <= 50) {
+                    tenNhanVatNhanDuoc = bannerHienTai.featured5Star;
+                    isGuaranteed = false; 
+                } else {
+                    let danhSachLech = kho5Sao.filter(char => char !== bannerHienTai.featured5Star);
+                    if (danhSachLech.length === 0) danhSachLech = kho5Sao; 
+                    tenNhanVatNhanDuoc = danhSachLech[Math.floor(Math.random() * danhSachLech.length)];
+                    isGuaranteed = true; 
+                }
+
+                localStorage.setItem('saygex_pity', pityCount);
+                localStorage.setItem('saygex_guaranteed', isGuaranteed);
+
+                return { name: tenNhanVatNhanDuoc, rarity: 5 };
+            } else if (ngauNhien <= 25.5) { 
+                localStorage.setItem('saygex_pity', pityCount);
+                let item = kho4Sao[Math.floor(Math.random() * kho4Sao.length)];
+                return { name: item, rarity: 4 };
+            } else { 
+                localStorage.setItem('saygex_pity', pityCount);
+                let item = kho3Sao[Math.floor(Math.random() * kho3Sao.length)];
+                return { name: item, rarity: 3 };
+            }
+        }
+
+        function quayGacha(soLuot) {
+            let chuoiTheHtml = "";
+            let doHiemCaoNhatTrongLoat = 3; 
+            let ten5SaoNoRa = null; 
+
+            // Reset thời gian hiện nút Skip dựa vào số lượt quay (quay x1 hiện nút nhanh hơn x10)
+            nutSkipGacha.style.animation = 'none';
+            nutSkipGacha.offsetHeight; 
+            if (soLuot === 1) {
+                nutSkipGacha.style.animation = "hienNutSkip 0.3s 0.6s ease-out forwards";
+            } else {
+                nutSkipGacha.style.animation = "hienNutSkip 0.3s 2.5s ease-out forwards";
+            }
+
+            for (let i = 0; i < soLuot; i++) {
+                let ketQuaRoll = rollItem();
+                
+                if (tuiDo[ketQuaRoll.name]) {
+                    tuiDo[ketQuaRoll.name].count += 1;
+                } else {
+                    tuiDo[ketQuaRoll.name] = { count: 1, rarity: ketQuaRoll.rarity };
+                }
+
+                if (ketQuaRoll.rarity > doHiemCaoNhatTrongLoat) {
+                    doHiemCaoNhatTrongLoat = ketQuaRoll.rarity;
+                }
+
+                if (ketQuaRoll.rarity === 5) {
+                    ten5SaoNoRa = ketQuaRoll.name; 
+                }
+
+                // Lấy ảnh tương ứng từ thư viện, nếu không có dùng ảnh tạm để tránh lỗi hiển thị broken image
+                let srcAnh = hinhAnhVatPham[ketQuaRoll.name] || "placeholder.png";
+                
+                // Tính độ trễ giây (stagger delay) cho hiệu ứng xuất hiện tuần tự từng thẻ
+                let thoiGianTre = i * 0.22; 
+
+                // Khởi tạo cụm cấu trúc thẻ Card HTML thay vì text thuần túy
+                chuoiTheHtml += `
+                    <div class="gacha-card rarity-${ketQuaRoll.rarity}" style="animation-delay: ${thoiGianTre}s;">
+                        <div class="card-img-box">
+                            <img src="${srcAnh}" alt="${ketQuaRoll.name}">
+                        </div>
+                        <div class="card-name">${ketQuaRoll.name}</div>
+                    </div>
+                `;
+            }
+
+            localStorage.setItem('saygex_inventory', JSON.stringify(tuiDo));
+            updatePityUI();
+
+            manHinhGacha.className = "gacha-screen"; 
+            if (doHiemCaoNhatTrongLoat === 5) {
+                amThanh('gold.mp3'); 
+                manHinhGacha.classList.add('flash-gold'); 
+                
+                if (ten5SaoNoRa && hinhAnhVatPham[ten5SaoNoRa]) {
+                    theAnh5Sao.src = hinhAnhVatPham[ten5SaoNoRa];
+                    vungKhungAnh5Sao.style.display = 'flex';
+                }
+            } else if (doHiemCaoNhatTrongLoat === 4) {
+                amThanh('pull.mp3'); 
+                manHinhGacha.classList.add('flash-purple'); 
+                vungKhungAnh5Sao.style.display = 'none';
+            } else {
+                amThanh('pull.mp3'); 
+                manHinhGacha.classList.add('flash-blue'); 
+                vungKhungAnh5Sao.style.display = 'none';
+            }
+
+            vungHienThiChu.innerHTML = chuoiTheHtml;
+            manHinhGacha.style.display = 'flex';
+        }
+
+        function moTuiDo() {
+            amThanh('click.mp3');
+            vungDanhSachTui.innerHTML = ''; 
+            if (Object.keys(tuiDo).length === 0) {
+                vungDanhSachTui.innerHTML = '<p style="text-align:center; color:#aaa; font-size:1.2em;">Túi đồ trống rỗng... Hãy quay gacha để tích lũy!</p>';
+            } else {
+                let danhSachSapXep = Object.keys(tuiDo).sort((a, b) => tuiDo[b].rarity - tuiDo[a].rarity);
+                for (let tenVatPham of danhSachSapXep) {
+                    let thongTinItem = tuiDo[tenVatPham];
+                    let mauSac = '#00ccff'; 
+                    if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
+                    else if (thongTinItem.rarity === 4) mauSac = '#e100ff'; 
+
+                    vungDanhSachTui.innerHTML += `
+                        <div class="inventory-item" style="color: ${mauSac}">
+                            <span>${tenVatPham}</span>
+                            <span>x${thongTinItem.count}</span>
+                        </div>
+                    `;
+                }
+            }
+            manHinhTuiDo.style.display = 'flex';
+        }
+
+        function xoaDuLieuTuiDo() {
+            if (confirm("Bạn có chắc chắn muốn xóa SẠCH túi đồ, reset Pity và Bảo Hiểm về ban đầu không?")) {
+                localStorage.removeItem('saygex_inventory');
+                localStorage.removeItem('saygex_pity');
+                localStorage.removeItem('saygex_guaranteed');
+                tuiDo = {};
+                pityCount = 0;
+                isGuaranteed = false;
+                updatePityUI();
+                moTuiDo();
+                alert("Đã thiết lập lại toàn bộ dữ liệu game thành công!");
+            }
+        }
+
+        function dongTuiDo() { 
+            amThanh('click.mp3');
+            manHinhTuiDo.style.display = 'none'; 
+        }
+        
+        function dongManHinh() { 
+            amThanh('click.mp3');
+            manHinhGacha.style.display = 'none'; 
+            theAnh5Sao.src = "";
+            vungKhungAnh5Sao.style.display = 'none';
+        }
+
+        /* 🌟 GÁN THÊM PHÍM TẮT ĐIỀU KHIỂN (G, E, ESCAPE) 🌟 */
+        document.addEventListener('keydown', function(event) {
+            // Nhấn phím E hoặc e khi đang ở màn hình gacha để Skip nhanh
+            if (event.key === 'e' || event.key === 'E') {
+                if (manHinhGacha.style.display === 'flex') {
+                    dongManHinh();
+                }
+            }
+            
+            if (event.key === 'g' || event.key === 'G') {
+                if (manHinhGacha.style.display === 'flex') return;
+                if (manHinhTuiDo.style.display === 'flex') {
+                    dongTuiDo();
+                } else {
+                    moTuiDo();
+                }
+            }
+            
+            if (event.key === 'Escape') {
+                dongTuiDo();
+                dongManHinh();
+            }
+        });
+
+        updatePityUI();
+    </script>
+</body>
+</html>
