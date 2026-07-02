@@ -43,6 +43,7 @@
             border: 1px solid #444;
             max-width: 95%;
         }
+
         .btn-tab {
             padding: 10px 16px;
             font-size: 0.95em;
@@ -54,10 +55,12 @@
             font-weight: bold;
             transition: all 0.2s ease;
         }
+
         .btn-tab:hover {
             color: white;
             background: #353545;
         }
+
         .btn-tab.active {
             background: linear-gradient(135deg, #ffd700, #ffaa00);
             color: #111;
@@ -80,6 +83,7 @@
             gap: 25px;
             margin-bottom: 15px;
         }
+
         button {
             padding: 15px 35px;
             font-size: 1.3em;
@@ -91,6 +95,7 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
             transition: all 0.3s ease;
         }
+
         button:hover {
             background: linear-gradient(135deg, #7a4f9a, #4c2c69);
             transform: translateY(-4px);
@@ -100,6 +105,7 @@
             background: linear-gradient(135deg, #2e7d32, #4caf50);
             border: 2px solid #388e3c;
         }
+
         .btn-inventory:hover {
             background: linear-gradient(135deg, #4caf50, #2e7d32);
         }
@@ -129,6 +135,7 @@
             border-radius: 6px;
             margin-top: 15px;
         }
+
         .btn-reset-data:hover {
             background: linear-gradient(135deg, #ef5350, #c62828);
         }
@@ -208,6 +215,7 @@
             position: relative;
             gap: 25px;
         }
+
         .char-splash-img {
             height: 100%;
             max-width: 40vw;
@@ -266,6 +274,7 @@
             background: rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
+
         .card-img-box img {
             width: 100%;
             height: 100%;
@@ -305,6 +314,7 @@
             border: 2px solid #e100ff;
             box-shadow: 0 0 15px rgba(225, 0, 255, 0.3);
         }
+
         .rarity-3 {
             background: linear-gradient(180deg, #2c3945, #517187);
             border: 1px solid #00ccff;
@@ -322,12 +332,14 @@
             opacity: 0;
             animation: hienNutSkip 0.4s 2.8s ease-out forwards;
         }
+
         @keyframes hienNutSkip { to { opacity: 1; } }
 
         .inventory-screen {
             background-color: rgba(10, 10, 15, 0.98);
             z-index: 100;
         }
+
         .inventory-box {
             width: 85%;
             max-width: 650px;
@@ -337,6 +349,7 @@
             padding: 25px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.7);
         }
+
         .inventory-title {
             color: #ffcc00;
             font-size: 2em;
@@ -345,24 +358,28 @@
             border-bottom: 2px solid #333;
             padding-bottom: 10px;
         }
+
         .inventory-list {
             max-height: 380px;
             overflow-y: auto;
             margin: 20px 0;
             padding-right: 10px;
         }
+
         .inventory-item {
             display: flex;
             flex-direction: column;
             padding: 12px 10px;
             border-bottom: 1px solid #2a2a3a;
         }
+
         .item-main-row {
             display: flex;
             justify-content: space-between;
             font-size: 1.3em;
             font-weight: bold;
         }
+
         .item-stats-row {
             display: flex;
             gap: 20px;
@@ -371,12 +388,14 @@
             color: #bbb;
             font-weight: normal;
         }
+
         .stat-badge {
             background: rgba(0, 0, 0, 0.4);
             padding: 2px 8px;
             border-radius: 4px;
             border: 1px solid #444;
         }
+
         .inventory-list::-webkit-scrollbar { width: 8px; }
         .inventory-list::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
     </style>
@@ -439,13 +458,11 @@
                 <input type="range" id="volume-slider" min="0" max="100" value="100" oninput="thayDoiAmLuong(this.value)">
             </div>
             
-            <!-- Nhóm nút điều khiển trong Cài đặt -->
             <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
                 <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 25px; font-size: 1em; background: linear-gradient(135deg, #1976d2, #2196f3); border: 1px solid #0d47a1;" onclick="toggleCredit()">Credit</button>
                 <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 25px; font-size: 1em;" onclick="dongSetting()">Đóng</button>
             </div>
 
-            <!-- Vùng hiển thị thông tin Tên Credit -->
             <div id="credit-content" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 12px;">
                 <div style="font-size: 0.9em; color: #ffd700; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Thực Hiện / Credit</div>
                 <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">Phạm Đức Anh</div>
@@ -454,11 +471,11 @@
     </div>
 
     <script>
+        // Cấu hình dữ liệu vật phẩm
         const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
         const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
 
-        // Bảng dữ liệu chỉ số thuộc tính cho các nhân vật 5 sao (HP <= 500, ATK đổi thành LV tối đa 90)
         const chiSo5Sao = {
             "★5 Nguyễn Minh Cường": { hp: 450, lv: 69 },
             "★5 Doom Mixing":       { hp: 420, lv: 36 },
@@ -484,12 +501,10 @@
             "★5 Kiều Lương tâm": "kieuluong.png",
             "★5 Phạm Đức Anh": "ducanh.png",
             "★5 Ba Hĩu": "bahiu.png", 
-            
             "★4 Ốp Điện Thoại": "op_dienthoai.png",
             "★4 Lốp": "lop.png",
             "★4 Ma Dog": "madog.png",
             "★4 Khô Gà": "khoga.png",
-            
             "★3 Fat Nigger": "fat.png",
             "★3 Warter Melon": "watermelon.png",
             "★3 Bã Mía": "bamia.png",
@@ -497,17 +512,20 @@
             "★3 Nguyễn Minh Phương": "phuong.png"
         };
 
+        // Khởi tạo trạng thái ứng dụng
         let currentBanner = 'cuong'; 
-
         let tuiDo = JSON.parse(localStorage.getItem('saygex_inventory')) || {};
         let pityCount = parseInt(localStorage.getItem('saygex_pity')) || 0;
         let isGuaranteed = localStorage.getItem('saygex_guaranteed') === 'true';
         
-        let amLuongTong = parseFloat(localStorage.getItem('saygex_volume')) !== null ? parseFloat(localStorage.getItem('saygex_volume')) : 1.0;
+        // Sửa lỗi kiểm tra logic lấy âm lượng ban đầu từ localStorage
+        let savedVolume = localStorage.getItem('saygex_volume');
+        let amLuongTong = savedVolume !== null ? parseFloat(savedVolume) : 1.0;
         if (isNaN(amLuongTong)) amLuongTong = 1.0;
 
         let cacAmThanhDangPhat = [];
 
+        // DOM Elements
         const manHinhGacha = document.getElementById('screen-gacha');
         const vungHienThiChu = document.getElementById('text-result');
         const manHinhTuiDo = document.getElementById('screen-inventory');
@@ -516,9 +534,11 @@
         const vungKhungAnh5Sao = document.getElementById('char-splash-area');
         const nutSkipGacha = document.getElementById('btn-skip-gacha');
 
+        // Đồng bộ dữ liệu âm lượng lên giao diện cài đặt ban đầu
         document.getElementById('volume-slider').value = Math.round(amLuongTong * 100);
         document.getElementById('volume-value').innerText = Math.round(amLuongTong * 100);
 
+        // Quản lý hệ thống âm thanh
         function amThanh(fileMpO) {
             let audio = new Audio(fileMpO);
             audio.volume = amLuongTong;
@@ -526,7 +546,7 @@
             audio.onended = function() {
                 cacAmThanhDangPhat = cacAmThanhDangPhat.filter(a => a !== audio);
             };
-            audio.play().catch(e => console.log("Thiếu file âm thanh: " + fileMpO));
+            audio.play().catch(e => console.log("Thiếu hoặc không thể phát file âm thanh: " + fileMpO));
         }
 
         function dungToanBoAmThanh() {
@@ -543,21 +563,18 @@
             localStorage.setItem('saygex_volume', amLuongTong);
         }
 
+        // Điều khiển hiển thị màn hình
         function moSetting() { amThanh('click.mp3'); manHinhSetting.style.display = 'flex'; }
         function dongSetting() { 
             amThanh('click.mp3'); 
             manHinhSetting.style.display = 'none'; 
-            document.getElementById('credit-content').style.display = 'none'; // Ẩn credit khi đóng cài đặt
+            document.getElementById('credit-content').style.display = 'none'; 
         }
 
         function toggleCredit() {
             amThanh('click.mp3');
             const creditDiv = document.getElementById('credit-content');
-            if (creditDiv.style.display === 'none' || creditDiv.style.display === '') {
-                creditDiv.style.display = 'block';
-            } else {
-                creditDiv.style.display = 'none';
-            }
+            creditDiv.style.display = (creditDiv.style.display === 'none' || creditDiv.style.display === '') ? 'block' : 'none';
         }
 
         function updatePityUI() {
@@ -581,6 +598,7 @@
             elementNut.classList.add('active');
         }
 
+        // Logic quay Gacha cốt lõi
         function rollItem() {
             pityCount++; 
             let nolo5Sao = false;
@@ -669,7 +687,7 @@
                 } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('KLT.mp3');
                 else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
                     amThanh('stagger.mp3'); amThanh('roland.mp3');
-                } else {amThanh('stagger.mp3'); amThanh('muk.mp3');}
+                } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); }
                 
                 manHinhGacha.classList.add('flash-gold'); 
                 danhSach5SaoNoRa.forEach(ten5Sao => {
@@ -689,6 +707,7 @@
             manHinhGacha.style.display = 'flex';
         }
 
+        // Quản lý kho đồ (Inventory)
         function moTuiDo() {
             amThanh('click.mp3');
             vungDanhSachTui.innerHTML = ''; 
@@ -705,7 +724,6 @@
                     else if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
                     else if (thongTinItem.rarity === 4) mauSac = '#e100ff'; 
 
-                    // Kiểm tra thuộc tính 5 sao để hiển thị LV và HP
                     if (thongTinItem.rarity === 5 && chiSo5Sao[tenVatPham]) {
                         let hp = chiSo5Sao[tenVatPham].hp;
                         let lv = chiSo5Sao[tenVatPham].lv;
@@ -752,6 +770,7 @@
             vungKhungAnh5Sao.style.display = 'none';
         }
 
+        // Lắng nghe sự kiện phím tắt từ bàn phím
         document.addEventListener('keydown', function(event) {
             if (event.key === 'e' || event.key === 'E') { if (manHinhGacha.style.display === 'flex') dongManHinh(); }
             if (event.key === 'g' || event.key === 'G') {
@@ -760,7 +779,8 @@
             }
             if (event.key === 'Escape') { dongTuiDo(); dongManHinh(); dongSetting(); }
         });
-//danhoccho
+
+        // Khởi chạy UI ban đầu
         updatePityUI();
     </script>
 </body>
