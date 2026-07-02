@@ -5,7 +5,7 @@
     <title>SAY GEX GACHA - GENSHIN STYLE V7 (LV & HP EDITION)</title>
     <style>
         body {
-            background-image: url('nanachi.webp');
+            background-image: url('assets/images/nanachi.webp');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -463,7 +463,7 @@
             <div id="credit-content" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 12px;">
                 <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">DEV: Dacvu Fox, Khánh Chan</div>
                 <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">Voice Actor: Phạm Đức Anh</div>
-                <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">Tester: Duin:3, Hải(MLH), Hải(Sộp), Nghĩa, Muk(Đ.Anh), Tùng(dado), Nhi(Nheo), Nguyên(Tọi), Hặc Cào, Heo(Búy).</div>
+                <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">Tester: Duin:3, Hải(MLH), Hải(Sộp), Nghĩa, Muk(Đ.Anh), Tùng(dado), Nhi(Nheo), Nguyên(Tọi), Hặc Cào, Heo(Búy),Khánh Chan.</div>
             </div>
         </div>
     </div>
@@ -493,21 +493,21 @@
         };
 
         const hinhAnhVatPham = {
-            "★5 Nguyễn Minh Cường": "cuong.jpg",
-            "★5 Doom Mixing": "doom.webp",
-            "★5 Coăn Bọa": "boan.webp",
-            "★5 Kiều Lương tâm": "kieuluong.png",
-            "★5 Phạm Đức Anh": "ducanh.png",
-            "★5 Ba Hĩu": "bahiu.png", 
-            "★4 Ốp Điện Thoại": "op_dienthoai.png",
-            "★4 Lốp": "lop.png",
-            "★4 Ma Dog": "madog.png",
-            "★4 Khô Gà": "khoga.png",
-            "★3 Fat Nigger": "fat.png",
-            "★3 Warter Melon": "watermelon.png",
-            "★3 Bã Mía": "bamia.png",
-            "★3 Lá Chanh": "lachanh.png",
-            "★3 Nguyễn Minh Phương": "phuong.png"
+            "★5 Nguyễn Minh Cường": "assets/images/cuong.jpg",
+            "★5 Doom Mixing": "assets/images/doom.webp",
+            "★5 Coăn Bọa": "assets/images/boan.webp",
+            "★5 Kiều Lương tâm": "assets/images/kieuluong.png",
+            "★5 Phạm Đức Anh": "assets/images/ducanh.png",
+            "★5 Ba Hĩu": "assets/images/bahiu.png", 
+            "★4 Ốp Điện Thoại": "assets/images/op_dienthoai.png",
+            "★4 Lốp": "assets/images/lop.png",
+            "★4 Ma Dog": "assets/images/madog.png",
+            "★4 Khô Gà": "assets/images/khoga.png",
+            "★3 Fat Nigger": "assets/images/fat.png",
+            "★3 Warter Melon": "assets/images/watermelon.png",
+            "★3 Bã Mía": "assets/images/bamia.png",
+            "★3 Lá Chanh": "assets/images/lachanh.png",
+            "★3 Nguyễn Minh Phương": "assets/images/phuong.png"
         };
 
         // Khởi tạo trạng thái ứng dụng
@@ -538,13 +538,15 @@
 
         // Quản lý hệ thống âm thanh
         function amThanh(fileMpO) {
-            let audio = new Audio(fileMpO);
+            // Chuẩn hóa đường dẫn và chuyển tên file nhạc về dạng chữ thường để tránh lỗi case-sensitive trên GitHub Pages (Linux)
+            let path = 'assets/audio/' + fileMpO.toLowerCase();
+            let audio = new Audio(path);
             audio.volume = amLuongTong;
             cacAmThanhDangPhat.push(audio);
             audio.onended = function() {
                 cacAmThanhDangPhat = cacAmThanhDangPhat.filter(a => a !== audio);
             };
-            audio.play().catch(e => console.log("Thiếu hoặc không thể phát file âm thanh: " + fileMpO));
+            audio.play().catch(e => console.log("Thiếu hoặc không thể phát file âm thanh: " + path));
         }
 
         function dungToanBoAmThanh() {
@@ -681,8 +683,8 @@
                 if (danhSach5SaoNoRa.includes("★5 Ba Hĩu")) amThanh('secret.mp3'); 
                 else if (danhSach5SaoNoRa.includes("★5 Doom Mixing")) amThanh('doom mixing.mp3');
                 else if (danhSach5SaoNoRa.includes("★5 Coăn Bọa")) {
-                    amThanh('coanboa.mp3'); amThanh('Limbus Company OST - In Hell We Live, Lament (Instrumental).mp3');
-                } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('KLT.mp3');
+                    amThanh('coanboa.mp3'); amThanh('limbus.mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('klt.mp3');
                 else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
                     amThanh('stagger.mp3'); amThanh('roland.mp3');
                 } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); }
