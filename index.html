@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>SAY GEX GACHA - GENSHIN STYLE V7 (STAGGER EDITION)</title>
+    <title>SAY GEX GACHA - GENSHIN STYLE V7 (LV & HP EDITION)</title>
     <style>
         body {
             background-image: url('nanachi.webp');
@@ -104,7 +104,6 @@
             background: linear-gradient(135deg, #4caf50, #2e7d32);
         }
 
-        /* Nút thiết lập nổi ở góc phải */
         .btn-setting-trigger {
             position: absolute;
             top: 20px;
@@ -255,10 +254,7 @@
         }
 
         @keyframes cardPopIn {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .card-img-box {
@@ -333,8 +329,8 @@
             z-index: 100;
         }
         .inventory-box {
-            width: 80%;
-            max-width: 600px;
+            width: 85%;
+            max-width: 650px;
             background: #1a1a24;
             border: 2px solid #333;
             border-radius: 15px;
@@ -350,18 +346,36 @@
             padding-bottom: 10px;
         }
         .inventory-list {
-            max-height: 350px;
+            max-height: 380px;
             overflow-y: auto;
             margin: 20px 0;
             padding-right: 10px;
         }
         .inventory-item {
             display: flex;
+            flex-direction: column;
+            padding: 12px 10px;
+            border-bottom: 1px solid #2a2a3a;
+        }
+        .item-main-row {
+            display: flex;
             justify-content: space-between;
             font-size: 1.3em;
             font-weight: bold;
-            padding: 10px;
-            border-bottom: 1px solid #2a2a3a;
+        }
+        .item-stats-row {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            margin-top: 4px;
+            color: #bbb;
+            font-weight: normal;
+        }
+        .stat-badge {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
         }
         .inventory-list::-webkit-scrollbar { width: 8px; }
         .inventory-list::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
@@ -369,7 +383,6 @@
 </head>
 <body>
 
-    <!-- Nút mở cài đặt hình bánh răng ⚙️ -->
     <button class="btn-setting-trigger" onclick="moSetting()">⚙️</button>
 
     <h1 id="banner-title">BANNER NGUYỄN MINH CƯỜNG</h1>
@@ -417,7 +430,7 @@
         </div>
     </div>
 
-    <!-- Màn hình Cài đặt (Setting) -->
+    <!-- Màn hình Cài đặt -->
     <div id="screen-setting" class="setting-screen">
         <div class="setting-box">
             <h2 class="inventory-title" style="font-size: 1.6em;">CÀI ĐẶT GAME</h2>
@@ -433,6 +446,16 @@
         const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
         const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
+
+        // Bảng dữ liệu chỉ số thuộc tính cho các nhân vật 5 sao (HP <= 500, ATK đổi thành LV tối đa 90)
+        const chiSo5Sao = {
+            "★5 Nguyễn Minh Cường": { hp: 450, lv: 90 },
+            "★5 Doom Mixing":       { hp: 420, lv: 90 },
+            "★5 Coăn Bọa":          { hp: 480, lv: 90 },
+            "★5 Kiều Lương tâm":    { hp: 390, lv: 90 },
+            "★5 Phạm Đức Anh":      { hp: 410, lv: 90 },
+            "★5 Ba Hĩu":            { hp: 500, lv: 90 } 
+        };
 
         const dataBanners = {
             cuong: { name: "Nguyễn Minh Cường", featured5Star: "★5 Nguyễn Minh Cường" },
@@ -469,9 +492,10 @@
         let pityCount = parseInt(localStorage.getItem('saygex_pity')) || 0;
         let isGuaranteed = localStorage.getItem('saygex_guaranteed') === 'true';
         
-        // Quản lý âm lượng tổng (mặc định là 1 (100%))
         let amLuongTong = parseFloat(localStorage.getItem('saygex_volume')) !== null ? parseFloat(localStorage.getItem('saygex_volume')) : 1.0;
         if (isNaN(amLuongTong)) amLuongTong = 1.0;
+
+        let cacAmThanhDangPhat = [];
 
         const manHinhGacha = document.getElementById('screen-gacha');
         const vungHienThiChu = document.getElementById('text-result');
@@ -481,16 +505,25 @@
         const vungKhungAnh5Sao = document.getElementById('char-splash-area');
         const nutSkipGacha = document.getElementById('btn-skip-gacha');
 
-        // Đồng bộ thanh slider âm lượng khi vừa vào game
         document.getElementById('volume-slider').value = Math.round(amLuongTong * 100);
         document.getElementById('volume-value').innerText = Math.round(amLuongTong * 100);
 
         function amThanh(fileMpO) {
             let audio = new Audio(fileMpO);
-            audio.volume = amLuongTong; // Áp dụng mức âm lượng cài đặt
-            audio.play().catch(e => {
-                console.log("Thông báo âm thanh: Cần tương tác trước hoặc thiếu file " + fileMpO);
+            audio.volume = amLuongTong;
+            cacAmThanhDangPhat.push(audio);
+            audio.onended = function() {
+                cacAmThanhDangPhat = cacAmThanhDangPhat.filter(a => a !== audio);
+            };
+            audio.play().catch(e => console.log("Thiếu file âm thanh: " + fileMpO));
+        }
+
+        function dungToanBoAmThanh() {
+            cacAmThanhDangPhat.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
             });
+            cacAmThanhDangPhat = [];
         }
 
         function thayDoiAmLuong(giaTri) {
@@ -499,15 +532,8 @@
             localStorage.setItem('saygex_volume', amLuongTong);
         }
 
-        function moSetting() {
-            amThanh('click.mp3');
-            manHinhSetting.style.display = 'flex';
-        }
-
-        function dongSetting() {
-            amThanh('click.mp3');
-            manHinhSetting.style.display = 'none';
-        }
+        function moSetting() { amThanh('click.mp3'); manHinhSetting.style.display = 'flex'; }
+        function dongSetting() { amThanh('click.mp3'); manHinhSetting.style.display = 'none'; }
 
         function updatePityUI() {
             document.getElementById('pity-num').innerText = pityCount;
@@ -536,9 +562,7 @@
             let ngauNhien = Math.random() * 100;
             let isLech = false; 
 
-            if (pityCount >= 90 || ngauNhien <= 0.5) {
-                nolo5Sao = true;
-            }
+            if (pityCount >= 90 || ngauNhien <= 0.5) nolo5Sao = true;
 
             if (nolo5Sao) {
                 pityCount = 0; 
@@ -559,32 +583,25 @@
 
                 localStorage.setItem('saygex_pity', pityCount);
                 localStorage.setItem('saygex_guaranteed', isGuaranteed);
-
                 return { name: tenNhanVatNhanDuoc, rarity: 5, isLech: isLech };
             } else if (ngauNhien <= 25.5) { 
                 localStorage.setItem('saygex_pity', pityCount);
-                let item = kho4Sao[Math.floor(Math.random() * kho4Sao.length)];
-                return { name: item, rarity: 4 };
+                return { name: kho4Sao[Math.floor(Math.random() * kho4Sao.length)], rarity: 4 };
             } else { 
                 localStorage.setItem('saygex_pity', pityCount);
-                let item = kho3Sao[Math.floor(Math.random() * kho3Sao.length)];
-                return { name: item, rarity: 3 };
+                return { name: kho3Sao[Math.floor(Math.random() * kho3Sao.length)], rarity: 3 };
             }
         }
 
         function quayGacha(soLuot) {
+            dungToanBoAmThanh();
             let chuoiTheHtml = "";
             let doHiemCaoNhatTrongLoat = 3; 
             let danhSach5SaoNoRa = []; 
-            let coLechBannerTrongLoat = false; 
 
             nutSkipGacha.style.animation = 'none';
             nutSkipGacha.offsetHeight; 
-            if (soLuot === 1) {
-                nutSkipGacha.style.animation = "hienNutSkip 0.3s 0.6s ease-out forwards";
-            } else {
-                nutSkipGacha.style.animation = "hienNutSkip 0.3s 2.5s ease-out forwards";
-            }
+            nutSkipGacha.style.animation = (soLuot === 1) ? "hienNutSkip 0.3s 0.6s ease-out forwards" : "hienNutSkip 0.3s 2.5s ease-out forwards";
 
             for (let i = 0; i < soLuot; i++) {
                 let ketQuaRoll = rollItem();
@@ -595,24 +612,13 @@
                     tuiDo[ketQuaRoll.name] = { count: 1, rarity: ketQuaRoll.rarity };
                 }
 
-                if (ketQuaRoll.rarity > doHiemCaoNhatTrongLoat) {
-                    doHiemCaoNhatTrongLoat = ketQuaRoll.rarity;
-                }
-
-                if (ketQuaRoll.rarity === 5) {
-                    danhSach5SaoNoRa.push(ketQuaRoll.name); 
-                    if (ketQuaRoll.isLech) {
-                        coLechBannerTrongLoat = true;
-                    }
-                }
+                if (ketQuaRoll.rarity > doHiemCaoNhatTrongLoat) doHiemCaoNhatTrongLoat = ketQuaRoll.rarity;
+                if (ketQuaRoll.rarity === 5) danhSach5SaoNoRa.push(ketQuaRoll.name);
 
                 let srcAnh = hinhAnhVatPham[ketQuaRoll.name] || "placeholder.png";
                 let thoiGianTre = i * 0.22; 
-
                 let classVienCard = `rarity-${ketQuaRoll.rarity}`;
-                if (ketQuaRoll.name === "★5 Ba Hĩu") {
-                    classVienCard = "rarity-red";
-                }
+                if (ketQuaRoll.name === "★5 Ba Hĩu") classVienCard = "rarity-red";
 
                 chuoiTheHtml += `
                     <div class="gacha-card ${classVienCard}" style="animation-delay: ${thoiGianTre}s;">
@@ -631,24 +637,16 @@
             manHinhGacha.className = "gacha-screen"; 
 
             if (doHiemCaoNhatTrongLoat === 5) {
-                if (danhSach5SaoNoRa.includes("★5 Ba Hĩu")) {
-                    amThanh('secret.mp3'); 
-                } else if (danhSach5SaoNoRa.includes("★5 Doom Mixing")) {
-                    amThanh('doom mixing.mp3');
-                } else if (danhSach5SaoNoRa.includes("★5 Coăn Bọa")) {
-                    amThanh('coanboa.mp3');
-                    amThanh('Limbus Company OST - In Hell We Live, Lament (Instrumental).mp3');
-                } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) {
-                    amThanh('KLT.mp3');
-                } else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
-                    amThanh('stagger.mp3');
-                    amThanh('roland.mp3');
-                } else {
-                    amThanh('stagger.mp3'); 
-                }
+                if (danhSach5SaoNoRa.includes("★5 Ba Hĩu")) amThanh('secret.mp3'); 
+                else if (danhSach5SaoNoRa.includes("★5 Doom Mixing")) amThanh('doom mixing.mp3');
+                else if (danhSach5SaoNoRa.includes("★5 Coăn Bọa")) {
+                    amThanh('coanboa.mp3'); amThanh('Limbus Company OST - In Hell We Live, Lament (Instrumental).mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('KLT.mp3');
+                else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
+                    amThanh('stagger.mp3'); amThanh('roland.mp3');
+                } else {amThanh('stagger.mp3'); amThanh('muk.mp3');}
                 
                 manHinhGacha.classList.add('flash-gold'); 
-                
                 danhSach5SaoNoRa.forEach(ten5Sao => {
                     if (hinhAnhVatPham[ten5Sao]) {
                         let lopBoSung = (ten5Sao === "★5 Ba Hĩu") ? "red-glow" : "";
@@ -657,13 +655,9 @@
                 });
                 vungKhungAnh5Sao.style.display = 'flex';
             } else if (doHiemCaoNhatTrongLoat === 4) {
-                amThanh('roll.mp3'); 
-                manHinhGacha.classList.add('flash-purple'); 
-                vungKhungAnh5Sao.style.display = 'none';
+                amThanh('roll.mp3'); manHinhGacha.classList.add('flash-purple'); vungKhungAnh5Sao.style.display = 'none';
             } else {
-                amThanh('roll.mp3'); 
-                manHinhGacha.classList.add('flash-blue'); 
-                vungKhungAnh5Sao.style.display = 'none';
+                amThanh('roll.mp3'); manHinhGacha.classList.add('flash-blue'); vungKhungAnh5Sao.style.display = 'none';
             }
 
             vungHienThiChu.innerHTML = chuoiTheHtml;
@@ -680,15 +674,31 @@
                 for (let tenVatPham of danhSachSapXep) {
                     let thongTinItem = tuiDo[tenVatPham];
                     let mauSac = '#00ccff'; 
+                    let phanChiSoHtml = ''; 
                     
                     if (tenVatPham === "★5 Ba Hĩu") mauSac = '#ff3333'; 
                     else if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
                     else if (thongTinItem.rarity === 4) mauSac = '#e100ff'; 
 
+                    // Kiểm tra thuộc tính 5 sao để hiển thị LV và HP
+                    if (thongTinItem.rarity === 5 && chiSo5Sao[tenVatPham]) {
+                        let hp = chiSo5Sao[tenVatPham].hp;
+                        let lv = chiSo5Sao[tenVatPham].lv;
+                        phanChiSoHtml = `
+                            <div class="item-stats-row">
+                                <span class="stat-badge" style="color: #4caf50;">⚔️ ATK LV: ${lv}</span>
+                                <span class="stat-badge" style="color: #ff4d4d;">❤️ HP: ${hp}</span>
+                            </div>
+                        `;
+                    }
+
                     vungDanhSachTui.innerHTML += `
-                        <div class="inventory-item" style="color: ${mauSac}">
-                            <span>${tenVatPham}</span>
-                            <span>x${thongTinItem.count}</span>
+                        <div class="inventory-item">
+                            <div class="item-main-row" style="color: ${mauSac}">
+                                <span>${tenVatPham}</span>
+                                <span>x${thongTinItem.count}</span>
+                            </div>
+                            ${phanChiSoHtml}
                         </div>
                     `;
                 }
@@ -701,21 +711,16 @@
                 localStorage.removeItem('saygex_inventory');
                 localStorage.removeItem('saygex_pity');
                 localStorage.removeItem('saygex_guaranteed');
-                tuiDo = {};
-                pityCount = 0;
-                isGuaranteed = false;
-                updatePityUI();
-                moTuiDo();
+                tuiDo = {}; pityCount = 0; isGuaranteed = false;
+                updatePityUI(); moTuiDo();
                 alert("Đã thiết lập lại toàn bộ dữ liệu game thành công!");
             }
         }
 
-        function dongTuiDo() { 
-            amThanh('click.mp3');
-            manHinhTuiDo.style.display = 'none'; 
-        }
+        function dongTuiDo() { amThanh('click.mp3'); manHinhTuiDo.style.display = 'none'; }
         
         function dongManHinh() { 
+            dungToanBoAmThanh();
             amThanh('click.mp3');
             manHinhGacha.style.display = 'none'; 
             vungKhungAnh5Sao.innerHTML = ""; 
@@ -723,26 +728,12 @@
         }
 
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'e' || event.key === 'E') {
-                if (manHinhGacha.style.display === 'flex') {
-                    dongManHinh();
-                }
-            }
-            
+            if (event.key === 'e' || event.key === 'E') { if (manHinhGacha.style.display === 'flex') dongManHinh(); }
             if (event.key === 'g' || event.key === 'G') {
                 if (manHinhGacha.style.display === 'flex') return;
-                if (manHinhTuiDo.style.display === 'flex') {
-                    dongTuiDo();
-                } else {
-                    moTuiDo();
-                }
+                if (manHinhTuiDo.style.display === 'flex') dongTuiDo(); else moTuiDo();
             }
-            
-            if (event.key === 'Escape') {
-                dongTuiDo();
-                dongManHinh();
-                dongSetting();
-            }
+            if (event.key === 'Escape') { dongTuiDo(); dongManHinh(); dongSetting(); }
         });
 
         updatePityUI();
