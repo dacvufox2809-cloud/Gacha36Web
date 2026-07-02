@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>SAY GEX GACHA - GENSHIN STYLE V7</title>
+    <title>SAY GEX GACHA - GENSHIN STYLE V7 (STAGGER EDITION)</title>
     <style>
         body {
             background-image: url('nanachi.webp');
@@ -18,6 +18,7 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            position: relative;
         }
         
         h1 {
@@ -103,6 +104,24 @@
             background: linear-gradient(135deg, #4caf50, #2e7d32);
         }
 
+        /* Nút thiết lập nổi ở góc phải */
+        .btn-setting-trigger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            font-size: 1.1em;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #555;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+        }
+
         .btn-reset-data {
             background: linear-gradient(135deg, #c62828, #ef5350);
             border: 1px solid #b71c1c;
@@ -115,7 +134,7 @@
             background: linear-gradient(135deg, #ef5350, #c62828);
         }
 
-        .gacha-screen, .inventory-screen {
+        .gacha-screen, .inventory-screen, .setting-screen {
             display: none; 
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -123,6 +142,41 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+        }
+
+        .setting-screen {
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 101;
+        }
+
+        .setting-box {
+            width: 320px;
+            background: #1a1a24;
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+
+        .volume-control {
+            margin: 25px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-control label {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .volume-control input[type="range"] {
+            width: 80%;
+            cursor: pointer;
+            accent-color: #ffd700;
         }
 
         .flash-blue { animation: animationXanh 0.6s ease-out forwards; }
@@ -148,26 +202,31 @@
         .char-splash-container {
             display: none;
             width: auto;
-            height: 32vh;  /* Tối ưu chiều cao để vừa khít cả ảnh to lẫn hàng thẻ bên dưới */
+            height: 32vh;
             margin-bottom: 10px;
             justify-content: center;
             align-items: center;
             position: relative;
+            gap: 25px;
         }
         .char-splash-img {
             height: 100%;
-            max-width: 90vw;
+            max-width: 40vw;
             object-fit: contain;
             opacity: 0;
             transform: scale(0.6) rotate(-3deg);
             filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6));
             animation: xuatHienSplash 0.6s 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
         }
+        
+        .char-splash-img.red-glow {
+            filter: drop-shadow(0 0 35px rgba(255, 0, 0, 0.85)) !important;
+        }
+
         @keyframes xuatHienSplash {
             to { opacity: 1; transform: scale(1) rotate(0deg); }
         }
 
-        /* KHU VỰC CHỨA CÁC THẺ CARD GACHA DÀN HÀNG NGANG */
         .item-result {
             display: flex;
             flex-wrap: wrap;
@@ -179,7 +238,6 @@
             padding: 10px;
         }
 
-        /* 🌟 CSS CHO TỪNG THẺ VẬT PHẨM XUẤT HIỆN TỪ TỪ 🌟 */
         .gacha-card {
             width: 120px;
             height: 190px;
@@ -191,8 +249,6 @@
             align-items: center;
             box-shadow: 0 8px 16px rgba(0,0,0,0.6);
             background: #1e1e24;
-            
-            /* Trạng thái ẩn ban đầu để chờ chạy hiệu ứng xuất hiện từ từ */
             opacity: 0;
             transform: translateY(40px) scale(0.5);
             animation: cardPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
@@ -205,7 +261,6 @@
             }
         }
 
-        /* Khung chứa hình ảnh của vật phẩm trong thẻ */
         .card-img-box {
             width: 100%;
             height: 135px;
@@ -221,7 +276,6 @@
             object-fit: cover;
         }
 
-        /* Tên hiển thị phía dưới chân thẻ */
         .card-name {
             font-size: 0.85em;
             font-weight: bold;
@@ -238,12 +292,18 @@
             text-shadow: 1px 1px 2px #000;
         }
 
-        /* Màu nền phân loại theo độ hiếm chuẩn Genshin */
         .rarity-5 {
             background: linear-gradient(180deg, #4a3c31, #b58543);
             border: 2px solid #ffd700;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
+        
+        .rarity-red {
+            background: linear-gradient(180deg, #3d1616, #9e2b2b);
+            border: 2px solid #ff1111;
+            box-shadow: 0 0 22px rgba(255, 17, 17, 0.7);
+        }
+
         .rarity-4 {
             background: linear-gradient(180deg, #38314a, #845396);
             border: 2px solid #e100ff;
@@ -254,7 +314,6 @@
             border: 1px solid #00ccff;
         }
 
-        /* Nút Đóng / Skip */
         .btn-close {
             margin-top: 15px;
             padding: 10px 40px;
@@ -265,7 +324,6 @@
             color: white;
             cursor: pointer;
             opacity: 0;
-            /* Xuất hiện sau khi chiếc thẻ cuối cùng của x10 đáp xuống xong xuôi */
             animation: hienNutSkip 0.4s 2.8s ease-out forwards;
         }
         @keyframes hienNutSkip { to { opacity: 1; } }
@@ -311,6 +369,9 @@
 </head>
 <body>
 
+    <!-- Nút mở cài đặt hình bánh răng ⚙️ -->
+    <button class="btn-setting-trigger" onclick="moSetting()">⚙️</button>
+
     <h1 id="banner-title">BANNER NGUYỄN MINH CƯỜNG</h1>
     
     <div class="banner-tabs">
@@ -319,6 +380,7 @@
         <button class="btn-tab" onclick="doiBanner('boan', this)">Coăn Bọa</button>
         <button class="btn-tab" onclick="doiBanner('kieuluong', this)">K.Lương tâm</button>
         <button class="btn-tab" onclick="doiBanner('ducanh', this)">Phạm Đức Anh</button>
+        <button class="btn-tab" onclick="doiBanner('hieu', this)">Ba Hĩu</button>
     </div>
 
     <div class="pity-counter">
@@ -335,14 +397,14 @@
         <button class="btn-inventory" onclick="moTuiDo()">Inventory (Phím G)</button>
     </div>
 
+    <!-- Màn hình Gacha -->
     <div id="screen-gacha" class="gacha-screen">
-        <div id="char-splash-area" class="char-splash-container">
-            <img id="char-splash-img" class="char-splash-img" src="" alt="Splash Art">
-        </div>
+        <div id="char-splash-area" class="char-splash-container"></div>
         <div id="text-result" class="item-result"></div>
         <button id="btn-skip-gacha" class="btn-close" onclick="dongManHinh()">Skip (Phím E)</button>
     </div>
 
+    <!-- Màn hình Kho đồ -->
     <div id="screen-inventory" class="inventory-screen">
         <div class="inventory-box">
             <h2 class="inventory-title">KHO VẬT PHẨM ĐÃ QUAY</h2>
@@ -355,8 +417,20 @@
         </div>
     </div>
 
+    <!-- Màn hình Cài đặt (Setting) -->
+    <div id="screen-setting" class="setting-screen">
+        <div class="setting-box">
+            <h2 class="inventory-title" style="font-size: 1.6em;">CÀI ĐẶT GAME</h2>
+            <div class="volume-control">
+                <label for="volume-slider">Âm lượng: <span id="volume-value">100</span>%</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="100" oninput="thayDoiAmLuong(this.value)">
+            </div>
+            <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 30px; font-size: 1em;" onclick="dongSetting()">Đóng</button>
+        </div>
+    </div>
+
     <script>
-        const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh"];
+        const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
         const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
 
@@ -365,25 +439,23 @@
             doom: { name: "Doom Mixing", featured5Star: "★5 Doom Mixing" },
             boan: { name: "Coăn Bọa", featured5Star: "★5 Coăn Bọa" },
             kieuluong: { name: "Kiều Lương tâm", featured5Star: "★5 Kiều Lương tâm" },
-            ducanh: { name: "Phạm Đức Anh", featured5Star: "★5 Phạm Đức Anh" }
+            ducanh: { name: "Phạm Đức Anh", featured5Star: "★5 Phạm Đức Anh" },
+            hieu: { name: "Ba Hĩu", featured5Star: "★5 Ba Hĩu" }
         };
 
-        /* 🌟 THƯ VIỆN ĐƯỜNG DẪN ẢNH CHO TỪNG VẬT PHẨM CỤ THỂ 🌟 */
         const hinhAnhVatPham = {
-            // Ảnh 5 Sao
             "★5 Nguyễn Minh Cường": "cuong.jpg",
             "★5 Doom Mixing": "doom.webp",
             "★5 Coăn Bọa": "boan.webp",
             "★5 Kiều Lương tâm": "kieuluong.png",
             "★5 Phạm Đức Anh": "ducanh.png",
+            "★5 Ba Hĩu": "bahiu.png", 
             
-            // Ảnh 4 Sao
             "★4 Ốp Điện Thoại": "op_dienthoai.png",
             "★4 Lốp": "lop.png",
             "★4 Ma Dog": "madog.png",
             "★4 Khô Gà": "khoga.png",
             
-            // Ảnh 3 Sao
             "★3 Fat Nigger": "fat.png",
             "★3 Warter Melon": "watermelon.png",
             "★3 Bã Mía": "bamia.png",
@@ -396,21 +468,45 @@
         let tuiDo = JSON.parse(localStorage.getItem('saygex_inventory')) || {};
         let pityCount = parseInt(localStorage.getItem('saygex_pity')) || 0;
         let isGuaranteed = localStorage.getItem('saygex_guaranteed') === 'true';
+        
+        // Quản lý âm lượng tổng (mặc định là 1 (100%))
+        let amLuongTong = parseFloat(localStorage.getItem('saygex_volume')) !== null ? parseFloat(localStorage.getItem('saygex_volume')) : 1.0;
+        if (isNaN(amLuongTong)) amLuongTong = 1.0;
 
         const manHinhGacha = document.getElementById('screen-gacha');
         const vungHienThiChu = document.getElementById('text-result');
         const manHinhTuiDo = document.getElementById('screen-inventory');
+        const manHinhSetting = document.getElementById('screen-setting');
         const vungDanhSachTui = document.getElementById('inventory-list');
-        
         const vungKhungAnh5Sao = document.getElementById('char-splash-area');
-        const theAnh5Sao = document.getElementById('char-splash-img');
         const nutSkipGacha = document.getElementById('btn-skip-gacha');
+
+        // Đồng bộ thanh slider âm lượng khi vừa vào game
+        document.getElementById('volume-slider').value = Math.round(amLuongTong * 100);
+        document.getElementById('volume-value').innerText = Math.round(amLuongTong * 100);
 
         function amThanh(fileMpO) {
             let audio = new Audio(fileMpO);
+            audio.volume = amLuongTong; // Áp dụng mức âm lượng cài đặt
             audio.play().catch(e => {
                 console.log("Thông báo âm thanh: Cần tương tác trước hoặc thiếu file " + fileMpO);
             });
+        }
+
+        function thayDoiAmLuong(giaTri) {
+            amLuongTong = giaTri / 100;
+            document.getElementById('volume-value').innerText = giaTri;
+            localStorage.setItem('saygex_volume', amLuongTong);
+        }
+
+        function moSetting() {
+            amThanh('click.mp3');
+            manHinhSetting.style.display = 'flex';
+        }
+
+        function dongSetting() {
+            amThanh('click.mp3');
+            manHinhSetting.style.display = 'none';
         }
 
         function updatePityUI() {
@@ -438,6 +534,7 @@
             pityCount++; 
             let nolo5Sao = false;
             let ngauNhien = Math.random() * 100;
+            let isLech = false; 
 
             if (pityCount >= 90 || ngauNhien <= 0.5) {
                 nolo5Sao = true;
@@ -448,20 +545,22 @@
                 let tenNhanVatNhanDuoc = "";
                 let bannerHienTai = dataBanners[currentBanner];
 
-                if (isGuaranteed || Math.random() * 100 <= 50) {
+                if (isGuaranteed || Math.random() * 100 <= 36) {
                     tenNhanVatNhanDuoc = bannerHienTai.featured5Star;
                     isGuaranteed = false; 
+                    isLech = false; 
                 } else {
                     let danhSachLech = kho5Sao.filter(char => char !== bannerHienTai.featured5Star);
                     if (danhSachLech.length === 0) danhSachLech = kho5Sao; 
                     tenNhanVatNhanDuoc = danhSachLech[Math.floor(Math.random() * danhSachLech.length)];
                     isGuaranteed = true; 
+                    isLech = true; 
                 }
 
                 localStorage.setItem('saygex_pity', pityCount);
                 localStorage.setItem('saygex_guaranteed', isGuaranteed);
 
-                return { name: tenNhanVatNhanDuoc, rarity: 5 };
+                return { name: tenNhanVatNhanDuoc, rarity: 5, isLech: isLech };
             } else if (ngauNhien <= 25.5) { 
                 localStorage.setItem('saygex_pity', pityCount);
                 let item = kho4Sao[Math.floor(Math.random() * kho4Sao.length)];
@@ -476,9 +575,9 @@
         function quayGacha(soLuot) {
             let chuoiTheHtml = "";
             let doHiemCaoNhatTrongLoat = 3; 
-            let ten5SaoNoRa = null; 
+            let danhSach5SaoNoRa = []; 
+            let coLechBannerTrongLoat = false; 
 
-            // Reset thời gian hiện nút Skip dựa vào số lượt quay (quay x1 hiện nút nhanh hơn x10)
             nutSkipGacha.style.animation = 'none';
             nutSkipGacha.offsetHeight; 
             if (soLuot === 1) {
@@ -501,18 +600,22 @@
                 }
 
                 if (ketQuaRoll.rarity === 5) {
-                    ten5SaoNoRa = ketQuaRoll.name; 
+                    danhSach5SaoNoRa.push(ketQuaRoll.name); 
+                    if (ketQuaRoll.isLech) {
+                        coLechBannerTrongLoat = true;
+                    }
                 }
 
-                // Lấy ảnh tương ứng từ thư viện, nếu không có dùng ảnh tạm để tránh lỗi hiển thị broken image
                 let srcAnh = hinhAnhVatPham[ketQuaRoll.name] || "placeholder.png";
-                
-                // Tính độ trễ giây (stagger delay) cho hiệu ứng xuất hiện tuần tự từng thẻ
                 let thoiGianTre = i * 0.22; 
 
-                // Khởi tạo cụm cấu trúc thẻ Card HTML thay vì text thuần túy
+                let classVienCard = `rarity-${ketQuaRoll.rarity}`;
+                if (ketQuaRoll.name === "★5 Ba Hĩu") {
+                    classVienCard = "rarity-red";
+                }
+
                 chuoiTheHtml += `
-                    <div class="gacha-card rarity-${ketQuaRoll.rarity}" style="animation-delay: ${thoiGianTre}s;">
+                    <div class="gacha-card ${classVienCard}" style="animation-delay: ${thoiGianTre}s;">
                         <div class="card-img-box">
                             <img src="${srcAnh}" alt="${ketQuaRoll.name}">
                         </div>
@@ -524,21 +627,41 @@
             localStorage.setItem('saygex_inventory', JSON.stringify(tuiDo));
             updatePityUI();
 
+            vungKhungAnh5Sao.innerHTML = "";
             manHinhGacha.className = "gacha-screen"; 
+
             if (doHiemCaoNhatTrongLoat === 5) {
-                amThanh('gold.mp3'); 
+                if (danhSach5SaoNoRa.includes("★5 Ba Hĩu")) {
+                    amThanh('secret.mp3'); 
+                } else if (danhSach5SaoNoRa.includes("★5 Doom Mixing")) {
+                    amThanh('doom mixing.mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Coăn Bọa")) {
+                    amThanh('coanboa.mp3');
+                    amThanh('Limbus Company OST - In Hell We Live, Lament (Instrumental).mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) {
+                    amThanh('KLT.mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
+                    amThanh('stagger.mp3');
+                    amThanh('roland.mp3');
+                } else {
+                    amThanh('stagger.mp3'); 
+                }
+                
                 manHinhGacha.classList.add('flash-gold'); 
                 
-                if (ten5SaoNoRa && hinhAnhVatPham[ten5SaoNoRa]) {
-                    theAnh5Sao.src = hinhAnhVatPham[ten5SaoNoRa];
-                    vungKhungAnh5Sao.style.display = 'flex';
-                }
+                danhSach5SaoNoRa.forEach(ten5Sao => {
+                    if (hinhAnhVatPham[ten5Sao]) {
+                        let lopBoSung = (ten5Sao === "★5 Ba Hĩu") ? "red-glow" : "";
+                        vungKhungAnh5Sao.innerHTML += `<img class="char-splash-img ${lopBoSung}" src="${hinhAnhVatPham[ten5Sao]}" alt="Splash Art">`;
+                    }
+                });
+                vungKhungAnh5Sao.style.display = 'flex';
             } else if (doHiemCaoNhatTrongLoat === 4) {
-                amThanh('pull.mp3'); 
+                amThanh('roll.mp3'); 
                 manHinhGacha.classList.add('flash-purple'); 
                 vungKhungAnh5Sao.style.display = 'none';
             } else {
-                amThanh('pull.mp3'); 
+                amThanh('roll.mp3'); 
                 manHinhGacha.classList.add('flash-blue'); 
                 vungKhungAnh5Sao.style.display = 'none';
             }
@@ -557,7 +680,9 @@
                 for (let tenVatPham of danhSachSapXep) {
                     let thongTinItem = tuiDo[tenVatPham];
                     let mauSac = '#00ccff'; 
-                    if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
+                    
+                    if (tenVatPham === "★5 Ba Hĩu") mauSac = '#ff3333'; 
+                    else if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
                     else if (thongTinItem.rarity === 4) mauSac = '#e100ff'; 
 
                     vungDanhSachTui.innerHTML += `
@@ -593,13 +718,11 @@
         function dongManHinh() { 
             amThanh('click.mp3');
             manHinhGacha.style.display = 'none'; 
-            theAnh5Sao.src = "";
+            vungKhungAnh5Sao.innerHTML = ""; 
             vungKhungAnh5Sao.style.display = 'none';
         }
 
-        /* 🌟 GÁN THÊM PHÍM TẮT ĐIỀU KHIỂN (G, E, ESCAPE) 🌟 */
         document.addEventListener('keydown', function(event) {
-            // Nhấn phím E hoặc e khi đang ở màn hình gacha để Skip nhanh
             if (event.key === 'e' || event.key === 'E') {
                 if (manHinhGacha.style.display === 'flex') {
                     dongManHinh();
@@ -618,6 +741,7 @@
             if (event.key === 'Escape') {
                 dongTuiDo();
                 dongManHinh();
+                dongSetting();
             }
         });
 
