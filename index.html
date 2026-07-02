@@ -438,7 +438,18 @@
                 <label for="volume-slider">Âm lượng: <span id="volume-value">100</span>%</label>
                 <input type="range" id="volume-slider" min="0" max="100" value="100" oninput="thayDoiAmLuong(this.value)">
             </div>
-            <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 30px; font-size: 1em;" onclick="dongSetting()">Đóng</button>
+            
+            <!-- Nhóm nút điều khiển trong Cài đặt -->
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 25px; font-size: 1em; background: linear-gradient(135deg, #1976d2, #2196f3); border: 1px solid #0d47a1;" onclick="toggleCredit()">Credit</button>
+                <button class="btn-close" style="opacity: 1; animation: none; padding: 8px 25px; font-size: 1em;" onclick="dongSetting()">Đóng</button>
+            </div>
+
+            <!-- Vùng hiển thị thông tin Tên Credit -->
+            <div id="credit-content" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 12px;">
+                <div style="font-size: 0.9em; color: #ffd700; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Thực Hiện / Credit</div>
+                <div style="font-size: 1.2em; color: #fff; font-weight: bold; margin-top: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.3);">Phạm Đức Anh</div>
+            </div>
         </div>
     </div>
 
@@ -449,11 +460,11 @@
 
         // Bảng dữ liệu chỉ số thuộc tính cho các nhân vật 5 sao (HP <= 500, ATK đổi thành LV tối đa 90)
         const chiSo5Sao = {
-            "★5 Nguyễn Minh Cường": { hp: 450, lv: 90 },
-            "★5 Doom Mixing":       { hp: 420, lv: 90 },
-            "★5 Coăn Bọa":          { hp: 480, lv: 90 },
+            "★5 Nguyễn Minh Cường": { hp: 450, lv: 69 },
+            "★5 Doom Mixing":       { hp: 420, lv: 36 },
+            "★5 Coăn Bọa":          { hp: 480, lv: 20 },
             "★5 Kiều Lương tâm":    { hp: 390, lv: 90 },
-            "★5 Phạm Đức Anh":      { hp: 410, lv: 90 },
+            "★5 Phạm Đức Anh":      { hp: 423, lv: 67 },
             "★5 Ba Hĩu":            { hp: 500, lv: 90 } 
         };
 
@@ -533,7 +544,21 @@
         }
 
         function moSetting() { amThanh('click.mp3'); manHinhSetting.style.display = 'flex'; }
-        function dongSetting() { amThanh('click.mp3'); manHinhSetting.style.display = 'none'; }
+        function dongSetting() { 
+            amThanh('click.mp3'); 
+            manHinhSetting.style.display = 'none'; 
+            document.getElementById('credit-content').style.display = 'none'; // Ẩn credit khi đóng cài đặt
+        }
+
+        function toggleCredit() {
+            amThanh('click.mp3');
+            const creditDiv = document.getElementById('credit-content');
+            if (creditDiv.style.display === 'none' || creditDiv.style.display === '') {
+                creditDiv.style.display = 'block';
+            } else {
+                creditDiv.style.display = 'none';
+            }
+        }
 
         function updatePityUI() {
             document.getElementById('pity-num').innerText = pityCount;
@@ -735,7 +760,7 @@
             }
             if (event.key === 'Escape') { dongTuiDo(); dongManHinh(); dongSetting(); }
         });
-
+//danhoccho
         updatePityUI();
     </script>
 </body>
