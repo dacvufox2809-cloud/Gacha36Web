@@ -469,6 +469,25 @@
     </div>
 
     <script>
+        // Hàm đọc/ghi an toàn để không bị sập trên môi trường Sandbox iframe
+        function docData(key, giaTriMacDinh) {
+            try {
+                let data = localStorage.getItem(key);
+                return data !== null ? data : giaTriMacDinh;
+            } catch (e) {
+                console.warn("Không thể truy cập localStorage do cài đặt trình duyệt:", e);
+                return giaTriMacDinh;
+            }
+        }
+
+        function ghiData(key, giaTri) {
+            try {
+                localStorage.setItem(key, giaTri);
+            } catch (e) {
+                console.warn("Không thể lưu trữ dữ liệu vào bộ nhớ thiết bị:", e);
+            }
+        }
+
         // Cấu hình dữ liệu vật phẩm
         const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
@@ -510,14 +529,14 @@
             "★3 Nguyễn Minh Phương": "assets/images/phuong.png"
         };
 
-        // Khởi tạo trạng thái ứng dụng
+        // Khởi tạo trạng thái ứng dụng an toàn thông qua hàm bọc try-catch
         let currentBanner = 'cuong'; 
-        let tuiDo = JSON.parse(localStorage.getItem('saygex_inventory')) || {};
-        let pityCount = parseInt(localStorage.getItem('saygex_pity')) || 0;
-        let isGuaranteed = localStorage.getItem('saygex_guaranteed') === 'true';
+        let tuiDo = {};
+        try { tuiDo = JSON.parse(docData('saygex_inventory', '{}')) || {}; } catch(e) { tuiDo = {}; }
+        let pityCount = parseInt(docData('saygex_pity', '0')) || 0;
+        let isGuaranteed = docData('saygex_guaranteed', 'false') === 'true';
         
-        // Sửa lỗi kiểm tra logic lấy âm lượng ban đầu từ localStorage
-        let savedVolume = localStorage.getItem('saygex_volume');
+        let savedVolume = docData('saygex_volume', '1.0');
         let amLuongTong = savedVolume !== null ? parseFloat(savedVolume) : 1.0;
         if (isNaN(amLuongTong)) amLuongTong = 1.0;
 
@@ -538,7 +557,6 @@
 
         // Quản lý hệ thống âm thanh
         function amThanh(fileMpO) {
-            // Chuẩn hóa đường dẫn và chuyển tên file nhạc về dạng chữ thường để tránh lỗi case-sensitive trên GitHub Pages (Linux)
             let path = 'assets/audio/' + fileMpO.toLowerCase();
             let audio = new Audio(path);
             audio.volume = amLuongTong;
@@ -560,7 +578,7 @@
         function thayDoiAmLuong(giaTri) {
             amLuongTong = giaTri / 100;
             document.getElementById('volume-value').innerText = giaTri;
-            localStorage.setItem('saygex_volume', amLuongTong);
+            ghiData('saygex_volume', amLuongTong);
         }
 
         // Điều khiển hiển thị màn hình
@@ -598,7 +616,7 @@
             elementNut.classList.add('active');
         }
 
-        // Logic quay Gacha cốt lõi
+        // Tối ưu hóa: Đã loại bỏ hoàn toàn việc lưu data liên tục trong lúc sinh ngẫu nhiên vật phẩm
         function rollItem() {
             pityCount++; 
             let nolo5Sao = false;
@@ -623,15 +641,10 @@
                     isGuaranteed = true; 
                     isLech = true; 
                 }
-
-                localStorage.setItem('saygex_pity', pityCount);
-                localStorage.setItem('saygex_guaranteed', isGuaranteed);
                 return { name: tenNhanVatNhanDuoc, rarity: 5, isLech: isLech };
             } else if (ngauNhien <= 25.5) { 
-                localStorage.setItem('saygex_pity', pityCount);
                 return { name: kho4Sao[Math.floor(Math.random() * kho4Sao.length)], rarity: 4 };
             } else { 
-                localStorage.setItem('saygex_pity', pityCount);
                 return { name: kho3Sao[Math.floor(Math.random() * kho3Sao.length)], rarity: 3 };
             }
         }
@@ -673,7 +686,10 @@
                 `;
             }
 
-            localStorage.setItem('saygex_inventory', JSON.stringify(tuiDo));
+            // Tối ưu hóa: Chỉ thực hiện ghi file/ghi đĩa duy nhất 1 lần sau khi kết thúc vòng lặp
+            ghiData('saygex_inventory', JSON.stringify(tuiDo));
+            ghiData('saygex_pity', pityCount);
+            ghiData('saygex_guaranteed', isGuaranteed);
             updatePityUI();
 
             vungKhungAnh5Sao.innerHTML = "";
@@ -751,9 +767,11 @@
 
         function xoaDuLieuTuiDo() {
             if (confirm("Bạn có chắc chắn muốn xóa SẠCH túi đồ, reset Pity và Bảo Hiểm về ban đầu không?")) {
-                localStorage.removeItem('saygex_inventory');
-                localStorage.removeItem('saygex_pity');
-                localStorage.removeItem('saygex_guaranteed');
+                try {
+                    localStorage.removeItem('saygex_inventory');
+                    localStorage.removeItem('saygex_pity');
+                    localStorage.removeItem('saygex_guaranteed');
+                } catch(e) {}
                 tuiDo = {}; pityCount = 0; isGuaranteed = false;
                 updatePityUI(); moTuiDo();
                 alert("Đã thiết lập lại toàn bộ dữ liệu game thành công!");
