@@ -720,9 +720,9 @@
         // Cấu hình bộ kỹ năng chi tiết cho thẻ 5 sao
         const boKyNang5Sao = {
             "★5 Nguyễn Minh Cường": [
-                { name: "Thương", base: 5, coin: "+3", count: 2 },
-                { name: "Xoáy Xoày Xoay", base: 4, coin: "+4", count: 2 },
-                { name: "Bí Mật Cơn Lốc Ninjago", base: 7, coin: "+10", count: 1 }
+                { name: "Thương", base: 3, coin: "+4", count: 2 },
+                { name: "Xoáy Xoày Xoay", base: 6, coin: "+4", count: 2 },
+                { name: "Bí Mật Cơn Lốc Ninjago", base: 9, coin: "+10", count: 1 }
             ],
             "★5 Kiều Lương tâm": [
                 { name: "BANG BANG BANG!!", base: 3, coin: "+3", count: 3 },
@@ -730,23 +730,23 @@
                 { name: "Cẩn Thận Đằng Sau Kìa Bé Yêu!", base: 6, coin: "+3", count: 7 }
             ],
             "★5 Doom Mixing": [
-                { name: "Alo, Vũ À Vũ?", base: 3, coin: "+6", count: 1 },
-                { name: "Chày Từ Ta", base: 5, coin: "+6", count: 1 },
-                { name: "Tù Ngay!", base: 11, coin: "+6", count: 1 }
+                { name: "Alo, Vũ À Vũ?", base: 6, coin: "+7", count: 1 },
+                { name: "Chày Từ Ta", base: 3, coin: "+6", count: 2 },
+                { name: "Tù Ngay!", base: 12, coin: "+6", count: 1 }
             ],
             "★5 Coăn Bọa": [
-                { name: "The Emperor's Fist!", base: 3, coin: "+5", count: 2 },
-                { name: "March of Roaches!", base: 5, coin: "+3", count: 3 },
-                { name: "'Son, don't forget to go for the heart'", base: 6, coin: "+3", count: 4 }
+                { name: "The Emperor's Fist!", base: 5, coin: "+5", count: 2 },
+                { name: "March of Roaches!", base: 5, coin: "+5", count: 3 },
+                { name: "'Son, don't forget to go for the heart'", base: 7, coin: "+3", count: 4 }
             ],
             "★5 Phạm Đức Anh": [
                 { name: "Cảnh Cáo", base: 3, coin: "+4", count: 3 },
-                { name: "Nợ 1 Đòi 10", base: 4, coin: "+4", count: 2 },
-                { name: "Võ Cua Nam Định", base: 5, coin: "+5", count: 1 }
+                { name: "Nợ 1 Đòi 10", base: 5, coin: "+4", count: 2 },
+                { name: "Võ Cua Nam Định", base: 10, coin: "+7", count: 1 }
             ],
             "★5 Ba Hĩu": [
-                { name: "Thập Chủng Ảnh Pháp", base: 3, coin: "+2", count: 4 },
-                { name: "Độ 0 Tuyệt Đối", base: 5, coin: "+2", count: 3 },
+                { name: "Thập Chủng Ảnh Pháp", base: 3, coin: "+3", count: 4 },
+                { name: "Độ 0 Tuyệt Đối", base: 5, coin: "+3", count: 3 },
                 { name: "VỚI KHO BÁU NÀY TA TRIỆU HỒI BABA YETI!!!", base: 1, coin: "+1", count: 1 }
             ]
         };
@@ -1030,8 +1030,8 @@
             document.getElementById('status-char-name').innerText = tenNhanVat.toUpperCase();
             document.getElementById('status-char-img').src = hinhAnhVatPham[tenNhanVat] || "placeholder.png";
             document.getElementById('status-char-lv').innerText = chiSo5Sao[tenNhanVat].lv;
-            document.getElementById('status-stat-hp').innerText = `❤️ HP: ${chiSo5Sao[tenNhanVat].hp}`;
-            document.getElementById('status-stat-atk').innerText = `⚔️ ATK LV: ${chiSo5Sao[tenNhanVat].lv}`;
+            document.getElementById('status-stat-hp').innerText = `HP: ${chiSo5Sao[tenNhanVat].hp}`;
+            document.getElementById('status-stat-atk').innerText = `DEF LV: ${chiSo5Sao[tenNhanVat].lv}`;
 
             // Đổ dữ liệu bộ kỹ năng xúc xắc tương ứng
             const vungKyNang = document.getElementById('status-skills-grid');
@@ -1060,6 +1060,7 @@
                 amThanh('coanboa.mp3'); 
                 amThanh('limbus.mp3');
             } else if (tenNhanVat === "★5 Kiều Lương tâm") {
+                amThanh('stagger.mp3'); 
                 amThanh('klt.mp3');
             } else if (tenNhanVat === "★5 Nguyễn Minh Cường") {
                 amThanh('stagger.mp3'); 
