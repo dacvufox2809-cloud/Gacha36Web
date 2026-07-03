@@ -140,7 +140,7 @@
             background: linear-gradient(135deg, #ef5350, #c62828);
         }
 
-        .gacha-screen, .inventory-screen, .setting-screen {
+        .gacha-screen, .inventory-screen, .setting-screen, .status-screen {
             display: none; 
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -371,6 +371,18 @@
             flex-direction: column;
             padding: 12px 10px;
             border-bottom: 1px solid #2a2a3a;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .inventory-item.clickable-5star {
+            cursor: pointer;
+        }
+
+        .inventory-item.clickable-5star:hover {
+            background: rgba(255, 215, 0, 0.08);
+            border-left: 3px solid #ffd700;
+            padding-left: 7px;
         }
 
         .item-main-row {
@@ -398,6 +410,155 @@
 
         .inventory-list::-webkit-scrollbar { width: 8px; }
         .inventory-list::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+        /* --- PHONG CÁCH GIAO DIỆN SỰ TRẠNG THÁI LIMBUS COMPANY --- */
+        .status-screen {
+            background-color: rgba(6, 6, 10, 0.96);
+            z-index: 102;
+        }
+
+        .status-container {
+            width: 92%;
+            max-width: 960px;
+            height: 82vh;
+            max-height: 560px;
+            background: #101014;
+            border: 2px solid #5a4331;
+            box-shadow: 0 0 35px rgba(0,0,0,0.9), inset 0 0 20px rgba(90, 67, 49, 0.3);
+            display: flex;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .status-left {
+            flex: 1.1;
+            position: relative;
+            background: #07070a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid #2e2218;
+        }
+
+        .status-left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.88;
+        }
+
+        .status-left-overlay {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #4e3929;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .status-right {
+            flex: 1.3;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, #1d1612, #101014);
+            overflow-y: auto;
+        }
+
+        .limbus-title-box {
+            background: #4a124a;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 1.35em;
+            font-weight: bold;
+            color: #fff;
+            border-left: 5px solid #ffd700;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .limbus-lv-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #222;
+        }
+
+        .limbus-uptie {
+            font-size: 2em;
+            color: #ff5500;
+            font-weight: bold;
+            text-shadow: 0 0 12px rgba(255,85,0,0.6);
+            border: 2px solid #ff5500;
+            padding: 0px 10px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .limbus-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #3a2b1f;
+            padding-bottom: 8px;
+        }
+
+        .limbus-tab {
+            background: transparent;
+            border: 1px solid #b58543;
+            color: #b58543;
+            padding: 6px 14px;
+            font-size: 0.9em;
+            border-radius: 4px;
+            box-shadow: none;
+            cursor: default;
+            font-weight: bold;
+        }
+
+        .limbus-tab.active {
+            background: linear-gradient(180deg, #ffd700, #b58543);
+            color: #111;
+            border-color: #ffd700;
+        }
+
+        .limbus-skills-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .limbus-skill-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #2a2a35;
+            padding: 10px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-close-top-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #8e1c1c;
+            border: 1px solid #ef5350;
+            padding: 5px 12px;
+            font-size: 0.9em;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            box-shadow: none;
+            z-index: 10;
+        }
+        .status-close-top-btn:hover { background: #b71c1c; }
     </style>
 </head>
 <body>
@@ -443,6 +604,60 @@
                 <button class="btn-close" style="opacity: 1; animation: none;" onclick="dongTuiDo()">Close</button>
                 <br>
                 <button class="btn-reset-data" onclick="xoaDuLieuTuiDo()">🗑️ Reset Toàn Bộ Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH TRẠNG THÁI CHI TIẾT KIỂU LIMBUS COMPANY -->
+    <div id="screen-status" class="status-screen">
+        <div class="status-container">
+            <button class="status-close-top-btn" onclick="dongBangTrangThai()">Đóng ✕</button>
+            
+            <!-- Bên trái: Hình nền nhân vật lớn & Khung chỉ số -->
+            <div class="status-left">
+                <img id="status-char-img" src="" alt="Splash Art">
+                <div class="status-left-overlay">
+                    <div style="color: #ffd700; font-weight: bold; margin-bottom: 6px; font-size: 1.05em;">📊 CHỈ SỐ CƠ BẢN</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.95em;">
+                        <div id="status-stat-hp" style="color: #ff4d4d; font-weight: bold;">❤️ HP: --</div>
+                        <div id="status-stat-atk" style="color: #4caf50; font-weight: bold;">⚔️ ATK LV: --</div>
+                        <div style="color: #ffb300;">👞 Tốc Độ: 4 - 7</div>
+                        <div style="color: #00ccff;">🛡️ Phòng Thủ: 62</div>
+                    </div>
+                    <div style="margin-top: 8px; border-top: 1px solid #3a2c22; padding-top: 6px; font-size: 0.85em; color: #bbb;">
+                        <span style="color: #ffaa00; font-weight: bold;">Kháng tính:</span> Khốn hiệu quả (x0.5) | Bình thường (x1) | Chí mạng (x2)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bên phải: Tên thẻ, Cấp độ, Bậc Uptie và Bộ kỹ năng xúc xắc -->
+            <div class="status-right">
+                <div id="status-char-name" class="limbus-title-box">IDENTITY NAME</div>
+                
+                <div class="limbus-lv-row">
+                    <div>
+                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">TIẾN TRÌNH LV</span>
+                        <div style="font-size: 1.6em; font-weight: bold; color: #fff;">
+                            LV <span id="status-char-lv" style="color: #ffd700;">60</span> <span style="font-size: 0.6em; color: #555;">/ 60 MAX</span>
+                        </div>
+                    </div>
+                    <div style="margin-left: auto; text-align: right;">
+                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">BẬC ĐỒNG BỘ</span>
+                        <div class="limbus-uptie">IV</div>
+                    </div>
+                </div>
+                
+                <div class="limbus-tabs">
+                    <div class="limbus-tab active">Tóm lược</div>
+                    <div class="limbus-tab">Kỹ Năng</div>
+                    <div class="limbus-tab">E.G.O</div>
+                    <div class="limbus-tab">Sự Tỉnh Táo</div>
+                </div>
+                
+                <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px; font-size: 1em; letter-spacing: 0.5px;">⚔️ ĐỒNG XU KỸ NĂNG (IDENTITY SKILLS)</div>
+                <div id="status-skills-grid" class="limbus-skills-grid">
+                    <!-- Kỹ năng sẽ tự động đổ dữ liệu bằng JavaScript -->
+                </div>
             </div>
         </div>
     </div>
@@ -494,12 +709,46 @@
         const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
 
         const chiSo5Sao = {
-            "★5 Nguyễn Minh Cường": { hp: 450, lv: 69 },
-            "★5 Doom Mixing":       { hp: 420, lv: 36 },
-            "★5 Coăn Bọa":          { hp: 480, lv: 20 },
-            "★5 Kiều Lương tâm":    { hp: 390, lv: 90 },
-            "★5 Phạm Đức Anh":      { hp: 423, lv: 67 },
-            "★5 Ba Hĩu":            { hp: 500, lv: 90 } 
+            "★5 Nguyễn Minh Cường": { hp: 450, lv: 60 },
+            "★5 Doom Mixing":       { hp: 420, lv: 60 },
+            "★5 Coăn Bọa":          { hp: 480, lv: 60 },
+            "★5 Kiều Lương tâm":    { hp: 390, lv: 60 },
+            "★5 Phạm Đức Anh":      { hp: 423, lv: 60 },
+            "★5 Ba Hĩu":            { hp: 500, lv: 60 } 
+        };
+
+        // Cấu hình bộ kỹ năng chi tiết cho thẻ 5 sao
+        const boKyNang5Sao = {
+            "★5 Nguyễn Minh Cường": [
+                { name: "Thương", base: 5, coin: "+3", count: 2 },
+                { name: "Xoáy Xoày Xoay", base: 4, coin: "+4", count: 2 },
+                { name: "Bí Mật Cơn Lốc Ninjago", base: 7, coin: "+10", count: 1 }
+            ],
+            "★5 Kiều Lương tâm": [
+                { name: "BANG BANG BANG!!", base: 3, coin: "+3", count: 3 },
+                { name: "Joestar Teachnique", base: 6, coin: "+2", count: 2 },
+                { name: "Cẩn Thận Đằng Sau Kìa Bé Yêu!", base: 6, coin: "+3", count: 7 }
+            ],
+            "★5 Doom Mixing": [
+                { name: "Alo, Vũ À Vũ?", base: 3, coin: "+6", count: 1 },
+                { name: "Chày Từ Ta", base: 5, coin: "+6", count: 1 },
+                { name: "Tù Ngay!", base: 11, coin: "+6", count: 1 }
+            ],
+            "★5 Coăn Bọa": [
+                { name: "The Emperor's Fist!", base: 3, coin: "+5", count: 2 },
+                { name: "March of Roaches!", base: 5, coin: "+3", count: 3 },
+                { name: "'Son, don't forget to go for the heart'", base: 6, coin: "+3", count: 4 }
+            ],
+            "★5 Phạm Đức Anh": [
+                { name: "Vung Kiếm Cảnh Cáo", base: 3, coin: "+4", count: 3 },
+                { name: "Áp Đảo Tinh Thần", base: 4, coin: "+4", count: 2 },
+                { name: "Tuyệt Kỹ Say Gex", base: 5, coin: "+5", count: 1 }
+            ],
+            "★5 Ba Hĩu": [
+                { name: "Thập Chủng Ảnh Pháp", base: 3, coin: "+2", count: 4 },
+                { name: "Độ 0 Tuyệt Đối", base: 5, coin: "+2", count: 3 },
+                { name: "VỚI KHO BÁU NÀY TA TRIỆU HỒI BABA YETI!!!", base: 1, coin: "+1", count: 1 }
+            ]
         };
 
         const dataBanners = {
@@ -547,6 +796,7 @@
         const vungHienThiChu = document.getElementById('text-result');
         const manHinhTuiDo = document.getElementById('screen-inventory');
         const manHinhSetting = document.getElementById('screen-setting');
+        const manHinhStatus = document.getElementById('screen-status');
         const vungDanhSachTui = document.getElementById('inventory-list');
         const vungKhungAnh5Sao = document.getElementById('char-splash-area');
         const nutSkipGacha = document.getElementById('btn-skip-gacha');
@@ -616,7 +866,6 @@
             elementNut.classList.add('active');
         }
 
-        // Tối ưu hóa: Đã loại bỏ hoàn toàn việc lưu data liên tục trong lúc sinh ngẫu nhiên vật phẩm
         function rollItem() {
             pityCount++; 
             let nolo5Sao = false;
@@ -686,7 +935,6 @@
                 `;
             }
 
-            // Tối ưu hóa: Chỉ thực hiện ghi file/ghi đĩa duy nhất 1 lần sau khi kết thúc vòng lặp
             ghiData('saygex_inventory', JSON.stringify(tuiDo));
             ghiData('saygex_pity', pityCount);
             ghiData('saygex_guaranteed', isGuaranteed);
@@ -735,6 +983,9 @@
                     let thongTinItem = tuiDo[tenVatPham];
                     let mauSac = '#00ccff'; 
                     let phanChiSoHtml = ''; 
+                    let lopTuongTac = '';
+                    let hanhDongClick = '';
+                    let bieuTuongGoiY = '';
                     
                     if (tenVatPham === "★5 Ba Hĩu") mauSac = '#ff3333'; 
                     else if (thongTinItem.rarity === 5) mauSac = '#ffd700'; 
@@ -743,6 +994,10 @@
                     if (thongTinItem.rarity === 5 && chiSo5Sao[tenVatPham]) {
                         let hp = chiSo5Sao[tenVatPham].hp;
                         let lv = chiSo5Sao[tenVatPham].lv;
+                        lopTuongTac = 'clickable-5star';
+                        hanhDongClick = `onclick="moBangTrangThai('${tenVatPham}')"`;
+                        bieuTuongGoiY = `<span style="font-size: 0.65em; color: #ffaa00; margin-left: 8px; font-weight: normal; border: 1px solid #ffaa00; padding: 1px 4px; border-radius:3px; vertical-align: middle;">📑information</span>`;
+                        
                         phanChiSoHtml = `
                             <div class="item-stats-row">
                                 <span class="stat-badge" style="color: #4caf50;">⚔️ ATK LV: ${lv}</span>
@@ -752,9 +1007,9 @@
                     }
 
                     vungDanhSachTui.innerHTML += `
-                        <div class="inventory-item">
+                        <div class="inventory-item ${lopTuongTac}" ${hanhDongClick}>
                             <div class="item-main-row" style="color: ${mauSac}">
-                                <span>${tenVatPham}</span>
+                                <span>${tenVatPham} ${bieuTuongGoiY}</span>
                                 <span>x${thongTinItem.count}</span>
                             </div>
                             ${phanChiSoHtml}
@@ -763,6 +1018,62 @@
                 }
             }
             manHinhTuiDo.style.display = 'flex';
+        }
+
+        // Quản lý Bảng trạng thái Limbus Company dành cho Thẻ 5 sao
+        function moBangTrangThai(tenNhanVat) {
+            dungToanBoAmThanh(); // Tắt các âm thanh đang chạy trước để tránh bị đè tiếng
+            amThanh('click.mp3');
+            if (!chiSo5Sao[tenNhanVat]) return;
+
+            // Đổ dữ liệu động vào panel Limbus
+            document.getElementById('status-char-name').innerText = tenNhanVat.toUpperCase();
+            document.getElementById('status-char-img').src = hinhAnhVatPham[tenNhanVat] || "placeholder.png";
+            document.getElementById('status-char-lv').innerText = chiSo5Sao[tenNhanVat].lv;
+            document.getElementById('status-stat-hp').innerText = `❤️ HP: ${chiSo5Sao[tenNhanVat].hp}`;
+            document.getElementById('status-stat-atk').innerText = `⚔️ ATK LV: ${chiSo5Sao[tenNhanVat].lv}`;
+
+            // Đổ dữ liệu bộ kỹ năng xúc xắc tương ứng
+            const vungKyNang = document.getElementById('status-skills-grid');
+            if (vungKyNang && boKyNang5Sao[tenNhanVat]) {
+                let colorCodes = ['#ffb300', '#ffaa00', '#ff5500'];
+                let htmlSkills = "";
+                boKyNang5Sao[tenNhanVat].forEach((skill, index) => {
+                    htmlSkills += `
+                        <div class="limbus-skill-item">
+                            <div><span style="color: ${colorCodes[index]}; font-weight: bold; margin-right: 6px;">[S${index + 1}]</span> ${skill.name}</div>
+                            <div style="color: #ff4444; font-weight: bold; font-size: 0.95em;">Cơ bản: ${skill.base} <span style="color:#aaa;font-weight:normal;">| Coins:</span> ${skill.coin} ×${skill.count}</div>
+                        </div>
+                    `;
+                });
+                vungKyNang.innerHTML = htmlSkills;
+            }
+
+            // Tạo hiệu ứng phát âm thanh đi kèm tương ứng cho TỪNG nhân vật 5 sao
+            if (tenNhanVat === "★5 Ba Hĩu") {
+                amThanh('secret.mp3');
+            } else if (tenNhanVat === "★5 Doom Mixing") {
+                amThanh('doom mixing.mp3');
+            } else if (tenNhanVat === "★5 Coăn Bọa") {
+                amThanh('coanboa.mp3'); 
+                amThanh('limbus.mp3');
+            } else if (tenNhanVat === "★5 Kiều Lương tâm") {
+                amThanh('klt.mp3');
+            } else if (tenNhanVat === "★5 Nguyễn Minh Cường") {
+                amThanh('stagger.mp3'); 
+                amThanh('roland.mp3');
+            } else if (tenNhanVat === "★5 Phạm Đức Anh") {
+                amThanh('stagger.mp3'); 
+                amThanh('muk.mp3');
+            }
+
+            manHinhStatus.style.display = 'flex';
+        }
+
+        function dongBangTrangThai() {
+            dungToanBoAmThanh(); // Tắt nhạc của nhân vật ngay lập tức khi người dùng nhấn Đóng
+            amThanh('click.mp3');
+            manHinhStatus.style.display = 'none';
         }
 
         function xoaDuLieuTuiDo() {
@@ -795,7 +1106,12 @@
                 if (manHinhGacha.style.display === 'flex') return;
                 if (manHinhTuiDo.style.display === 'flex') dongTuiDo(); else moTuiDo();
             }
-            if (event.key === 'Escape') { dongTuiDo(); dongManHinh(); dongSetting(); }
+            if (event.key === 'Escape') { 
+                dongTuiDo(); 
+                dongManHinh(); 
+                dongSetting(); 
+                dongBangTrangThai(); 
+            }
         });
 
         // Khởi chạy UI ban đầu
