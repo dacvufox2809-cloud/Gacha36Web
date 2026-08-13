@@ -798,7 +798,7 @@
                         <div style="color: #00ccff;">ATK: 62</div>
                     </div>
                     <div style="margin-top: 8px; border-top: 1px solid #3a2c22; padding-top: 6px; font-size: 0.85em; color: #bbb;">
-                        <span style="color: #ffaa00; font-weight: bold;">Kháng tính:</span> Khốn hiệu quả (x0.5) | Bình thường (x1) | Chí mạng (x2)
+                        <span style="color: #ffaa00; font-weight: bold;">Kháng tính:</span> Blunt (x0.5) | Pierce (x1) | Slash (x2)
                     </div>
                 </div>
             </div>
@@ -809,13 +809,13 @@
                 
                 <div class="limbus-lv-row">
                     <div>
-                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">TIẾN TRÌNH LV</span>
+                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">LV</span>
                         <div style="font-size: 1.6em; font-weight: bold; color: #fff;">
                             LV <span id="status-char-lv" style="color: #ffd700;">60</span> <span style="font-size: 0.6em; color: #555;">/ 60 MAX</span>
                         </div>
                     </div>
                     <div style="margin-left: auto; text-align: right;">
-                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">BẬC ĐỒNG BỘ</span>
+                        <span style="color: #999; font-size: 0.82em; font-weight: bold; display:block; margin-bottom:2px;">TIER</span>
                         <div class="limbus-uptie">IV</div>
                     </div>
                 </div>
@@ -824,7 +824,7 @@
                     <div class="limbus-tab active">Tóm lược</div>
                     <div class="limbus-tab">Kỹ Năng</div>
                     <div class="limbus-tab">E.G.O</div>
-                    <div class="limbus-tab">Sự Tỉnh Táo</div>
+                    <div class="limbus-tab">Sanity</div>
                 </div>
                 
                 <div style="color: #ffd700; font-weight: bold; margin-bottom: 10px; font-size: 1em; letter-spacing: 0.5px;">IDENTITY SKILLS</div>
@@ -985,220 +985,6 @@
             "★3 Nguyễn Minh Phương": "assets/images/phuong.png"
         };
 
-        // Hàm băm mật khẩu cơ bản (Polynomial Rolling Hash / Base conversion theo phong cách MarisaOJ string hashing)
-        function hoaThanhHash(str) {
-            if (!str) return "";
-            const BASE1 = 311;
-            const MOD1 = 1000000007;
-            const BASE2 = 131;
-            const MOD2 = 998244353;
-            
-            let hash1 = 0;
-            let hash2 = 0;
-            
-            for (let i = 0; i < str.length; i++) {
-                const code = str.charCodeAt(i);
-                hash1 = (hash1 * BASE1 + code) % MOD1;
-                hash2 = (hash2 * BASE2 + code) % MOD2;
-            }
-            
-            return hash1.toString(36) + "_" + hash2.toString(36);
-        }
-
-        // Khóa lưu trữ danh sách tất cả tài khoản theo yêu cầu: LEGACY_RUN_1_4_ACCOUNTS
-        const ACCOUNTS_KEY = 'LEGACY_RUN_1_4_ACCOUNTS';
-        let activeUser = docData('saygex_current_user', null);
-
-        function getAccountsObject() {
-            let accountsData = docData(ACCOUNTS_KEY, '{}');
-            try {
-                return JSON.parse(accountsData) || {};
-            } catch (e) {
-                return {};
-            }
-        }
-
-        function saveAccountsObject(accountsObj) {
-            ghiData(ACCOUNTS_KEY, JSON.stringify(accountsObj));
-        }
-
-        function loadUserData(data) {
-            if (!data) return;
-            tuiDo = data.inventory || {};
-            pityCount = typeof data.pity === 'number' ? data.pity : 0;
-            isGuaranteed = !!data.guaranteed;
-            if (typeof data.volume === 'number' && !isNaN(data.volume)) {
-                amLuongTong = data.volume;
-                let slider = document.getElementById('volume-slider');
-                if (slider) slider.value = Math.round(amLuongTong * 100);
-                let volVal = document.getElementById('volume-value');
-                if (volVal) volVal.innerText = Math.round(amLuongTong * 100);
-            }
-            updatePityUI();
-        }
-
-        function saveCurrentUserData() {
-            let currentData = {
-                inventory: tuiDo,
-                pity: pityCount,
-                guaranteed: isGuaranteed,
-                volume: amLuongTong
-            };
-            
-            if (activeUser) {
-                let accounts = getAccountsObject();
-                let key = activeUser.toLowerCase();
-                if (accounts[key]) {
-                    accounts[key].data = currentData;
-                    saveAccountsObject(accounts);
-                }
-            } else {
-                ghiData('saygex_inventory', JSON.stringify(tuiDo));
-                ghiData('saygex_pity', pityCount);
-                ghiData('saygex_guaranteed', isGuaranteed);
-            }
-            ghiData('saygex_volume', amLuongTong);
-        }
-
-        // Hàm xử lý tập trung Đăng nhập & Đăng ký (handleAuthSubmit)
-        function handleAuthSubmit(event, mode) {
-            if (event) event.preventDefault();
-            
-            const usernameInput = document.getElementById('auth-username');
-            const passwordInput = document.getElementById('auth-password');
-            const importGuestCheck = document.getElementById('auth-import-guest');
-            const authError = document.getElementById('auth-error-msg');
-            
-            if (!usernameInput || !passwordInput || !authError) return;
-            
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            authError.style.display = 'none';
-            authError.innerText = '';
-            
-            if (!username || !password) {
-                authError.innerText = "Vui lòng nhập đầy đủ tên tài khoản và mật khẩu!";
-                authError.style.display = 'block';
-                return;
-            }
-            
-            let accounts = getAccountsObject();
-            const userKey = username.toLowerCase();
-            const passHash = hoaThanhHash(password);
-            
-            if (mode === 'login') {
-                if (!accounts[userKey]) {
-                    authError.innerText = "Tài khoản không tồn tại! Vui lòng kiểm tra lại tên tài khoản hoặc chọn Đăng ký.";
-                    authError.style.display = 'block';
-                    return;
-                }
-                
-                if (accounts[userKey].passwordHash !== passHash) {
-                    authError.innerText = "Mật khẩu không chính xác! Vui lòng thử lại.";
-                    authError.style.display = 'block';
-                    return;
-                }
-                
-                // Đăng nhập thành công
-                activeUser = accounts[userKey].username;
-                ghiData('saygex_current_user', activeUser);
-                loadUserData(accounts[userKey].data);
-                updateAuthUI();
-                dongAuthModal();
-                alert(`Đăng nhập thành công! Chào mừng ${activeUser} trở lại.`);
-                
-            } else if (mode === 'signup') {
-                if (accounts[userKey]) {
-                    authError.innerText = "Tên tài khoản này đã tồn tại! Vui lòng chọn tên tài khoản khác.";
-                    authError.style.display = 'block';
-                    return;
-                }
-                
-                let initialData = {
-                    inventory: {},
-                    pity: 0,
-                    guaranteed: false,
-                    volume: 1.0
-                };
-                
-                if (importGuestCheck && importGuestCheck.checked) {
-                    initialData = {
-                        inventory: JSON.parse(JSON.stringify(tuiDo)),
-                        pity: pityCount,
-                        guaranteed: isGuaranteed,
-                        volume: amLuongTong
-                    };
-                }
-                
-                accounts[userKey] = {
-                    username: username,
-                    passwordHash: passHash,
-                    createdAt: new Date().toISOString(),
-                    data: initialData
-                };
-                
-                saveAccountsObject(accounts);
-                
-                activeUser = username;
-                ghiData('saygex_current_user', activeUser);
-                loadUserData(initialData);
-                updateAuthUI();
-                dongAuthModal();
-                alert(`Đăng ký tài khoản thành công! Đã tự động đăng nhập dưới tên ${username}.`);
-            }
-        }
-
-        function moAuthModal() {
-            amThanh('click.mp3');
-            const authScreen = document.getElementById('screen-auth');
-            if (authScreen) authScreen.style.display = 'flex';
-        }
-
-        function dongAuthModal() {
-            amThanh('click.mp3');
-            const authScreen = document.getElementById('screen-auth');
-            if (authScreen) authScreen.style.display = 'none';
-            const err = document.getElementById('auth-error-msg');
-            if (err) { err.style.display = 'none'; err.innerText = ''; }
-            const uInput = document.getElementById('auth-username');
-            if (uInput) uInput.value = '';
-            const pInput = document.getElementById('auth-password');
-            if (pInput) pInput.value = '';
-        }
-
-        function dangXuatUser() {
-            amThanh('click.mp3');
-            if (confirm("Bạn có chắc chắn muốn đăng xuất tài khoản hiện tại không?")) {
-                activeUser = null;
-                try { localStorage.removeItem('saygex_current_user'); } catch(e){}
-                // Tải dữ liệu Khách (Guest)
-                tuiDo = JSON.parse(docData('saygex_inventory', '{}')) || {};
-                pityCount = parseInt(docData('saygex_pity', '0')) || 0;
-                isGuaranteed = docData('saygex_guaranteed', 'false') === 'true';
-                updatePityUI();
-                updateAuthUI();
-                alert("Đã đăng xuất! Bạn đang ở chế độ Tài khoản Khách (Guest).");
-            }
-        }
-
-        function updateAuthUI() {
-            const badgeBtn = document.getElementById('user-badge-btn');
-            if (activeUser) {
-                if (badgeBtn) {
-                    badgeBtn.onclick = dangXuatUser;
-                    badgeBtn.title = "Nhấn để Đăng xuất";
-                    badgeBtn.innerHTML = `👤 <span>${activeUser}</span> <span class="btn-logout-small">Đăng xuất</span>`;
-                }
-            } else {
-                if (badgeBtn) {
-                    badgeBtn.onclick = moAuthModal;
-                    badgeBtn.title = "Nhấn để Đăng nhập / Đăng ký";
-                    badgeBtn.innerHTML = `👤 <span>Khách</span>`;
-                }
-            }
-        }
-
         // Khởi tạo trạng thái ứng dụng an toàn thông qua hàm bọc try-catch
         let currentBanner = 'cuong'; 
         let tuiDo = {};
@@ -1228,7 +1014,7 @@
 
         // Quản lý hệ thống âm thanh
         function amThanh(fileMpO) {
-            let path = 'assets/audio/' + fileMpO;
+            let path = 'assets/audio/' + fileMpO.toLowerCase();
             let audio = new Audio(path);
             audio.volume = amLuongTong;
             cacAmThanhDangPhat.push(audio);
@@ -1249,7 +1035,7 @@
         function thayDoiAmLuong(giaTri) {
             amLuongTong = giaTri / 100;
             document.getElementById('volume-value').innerText = giaTri;
-            saveCurrentUserData();
+            ghiData('saygex_volume', amLuongTong);
         }
 
         // Điều khiển hiển thị màn hình
@@ -1372,7 +1158,7 @@
                 } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('klt.mp3');
                 else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
                     amThanh('stagger.mp3'); amThanh('roland.mp3');
-                } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); }
+                } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); amThanh('Matthias.mp3'); }
                 
                 manHinhGacha.classList.add('flash-gold'); 
                 danhSach5SaoNoRa.forEach(ten5Sao => {
@@ -1478,8 +1264,7 @@
                 amThanh('doom mixing.mp3');
             } else if (tenNhanVat === "★5 Coăn Bọa") {
                 amThanh('stagger.mp3'); 
-                amThanh('coanboa.mp3'); 
-                amThanh('limbus.mp3');
+                amThanh('coanboa.mp3');
             } else if (tenNhanVat === "★5 Kiều Lương tâm") {
                 amThanh('stagger.mp3'); 
                 amThanh('klt.mp3');
@@ -1488,7 +1273,8 @@
                 amThanh('roland.mp3');
             } else if (tenNhanVat === "★5 Phạm Đức Anh") {
                 amThanh('stagger.mp3'); 
-                let matthiasAudio = new Audio('assets/audio/matthias.mp3');
+                amThanh('Matthias.mp3'); 
+                let matthiasAudio = new Audio('assets/audio/Matthias.mp3');
                 matthiasAudio.volume = amLuongTong * 0.5; // Bạn có thể chỉnh 0.5 thành mức khác tùy ý (từ 0.0 đến 1.0)
                 cacAmThanhDangPhat.push(matthiasAudio);
                 matthiasAudio.onended = function() {
