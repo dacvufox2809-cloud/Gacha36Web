@@ -1356,7 +1356,9 @@
                 `;
             }
 
-            saveCurrentUserData();
+            ghiData('saygex_inventory', JSON.stringify(tuiDo));
+            ghiData('saygex_pity', pityCount);
+            ghiData('saygex_guaranteed', isGuaranteed);
             updatePityUI();
 
             vungKhungAnh5Sao.innerHTML = "";
@@ -1486,7 +1488,7 @@
                 amThanh('roland.mp3');
             } else if (tenNhanVat === "★5 Phạm Đức Anh") {
                 amThanh('stagger.mp3'); 
-                let matthiasAudio = new Audio('assets/audio/Matthias.mp3');
+                let matthiasAudio = new Audio('assets/audio/matthias.mp3');
                 matthiasAudio.volume = amLuongTong * 0.5; // Bạn có thể chỉnh 0.5 thành mức khác tùy ý (từ 0.0 đến 1.0)
                 cacAmThanhDangPhat.push(matthiasAudio);
                 matthiasAudio.onended = function() {
@@ -1507,8 +1509,12 @@
 
         function xoaDuLieuTuiDo() {
             if (confirm("Bạn có chắc chắn muốn xóa SẠCH túi đồ, reset Pity và Bảo Hiểm về ban đầu không?")) {
+                try {
+                    localStorage.removeItem('saygex_inventory');
+                    localStorage.removeItem('saygex_pity');
+                    localStorage.removeItem('saygex_guaranteed');
+                } catch(e) {}
                 tuiDo = {}; pityCount = 0; isGuaranteed = false;
-                saveCurrentUserData();
                 updatePityUI(); moTuiDo();
                 alert("Đã thiết lập lại toàn bộ dữ liệu game thành công!");
             }
@@ -1526,7 +1532,6 @@
 
         // Lắng nghe sự kiện phím tắt từ bàn phím
         document.addEventListener('keydown', function(event) {
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
             if (event.key === 'e' || event.key === 'E') { if (manHinhGacha.style.display === 'flex') dongManHinh(); }
             if (event.key === 'g' || event.key === 'G') {
                 if (manHinhGacha.style.display === 'flex') return;
@@ -1537,22 +1542,11 @@
                 dongManHinh(); 
                 dongSetting(); 
                 dongBangTrangThai(); 
-                dongAuthModal();
             }
         });
 
-        // Khởi chạy UI & nạp session tài khoản ban đầu
-        if (activeUser) {
-            let accounts = getAccountsObject();
-            let key = activeUser.toLowerCase();
-            if (accounts[key]) {
-                loadUserData(accounts[key].data);
-            } else {
-                activeUser = null;
-            }
-        }
+        // Khởi chạy UI ban đầu
         updatePityUI();
-        updateAuthUI();
     </script>
 </body>
 </html>
