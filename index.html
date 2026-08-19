@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>SAY GEX GACHA - GENSHIN STYLE V7 (LV & HP EDITION)</title>
+    <title>Gacha Lục Cửu</title>
     <style>
         body {
             background-image: url('assets/images/nanachi.webp');
@@ -747,6 +747,7 @@
         <button class="btn-tab" onclick="doiBanner('kieuluong', this)">K.Lương tâm</button>
         <button class="btn-tab" onclick="doiBanner('ducanh', this)">Phạm Đức Anh</button>
         <button class="btn-tab" onclick="doiBanner('hieu', this)">Ba Hĩu</button>
+        <button class="btn-tab" onclick="doiBanner('king', this)">Hoàng Đế Xì Mi</button>
     </div>
 
     <div class="pity-counter">
@@ -1128,7 +1129,7 @@
         }
 
         // Cấu hình dữ liệu vật phẩm
-        const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu"];
+        const kho5Sao = ["★5 Nguyễn Minh Cường", "★5 Doom Mixing", "★5 Coăn Bọa", "★5 Kiều Lương tâm", "★5 Phạm Đức Anh", "★5 Ba Hĩu", "★5 Hoàng Đế Xì Mi"];
         const kho4Sao = ["★4 Ốp Điện Thoại", "★4 Lốp", "★4 Ma Dog", "★4 Khô Gà"]; 
         const kho3Sao = ["★3 Fat Nigger", "★3 Warter Melon", "★3 Bã Mía", "★3 Lá Chanh", "★3 Nguyễn Minh Phương"];
 
@@ -1138,7 +1139,8 @@
             "★5 Coăn Bọa":          { hp: 480, lv: 60 },
             "★5 Kiều Lương tâm":    { hp: 390, lv: 60 },
             "★5 Phạm Đức Anh":      { hp: 423, lv: 60 },
-            "★5 Ba Hĩu":            { hp: 500, lv: 60 } 
+            "★5 Ba Hĩu":            { hp: 500, lv: 60 },
+            "★5 Hoàng Đế Xì Mi":    { hp: 670, lv: 60 } 
         };
 
         // Cấu hình bộ kỹ năng chi tiết cho thẻ 5 sao
@@ -1170,8 +1172,13 @@
             ],
             "★5 Ba Hĩu": [
                 { name: "Thập Chủng Ảnh Pháp", base: 3, coin: "+3", count: 4 },
-                { name: "Độ 0 Tuyệt Đối", base: 5, coin: "+3", count: 3 },
+                { name: "Độ 0 Tuyệt Đối", base: 5, coin: "+2", count: 3 },
                 { name: "VỚI KHO BÁU NÀY TA TRIỆU HỒI BABA YETI!!!", base: 1, coin: "+1", count: 1 }
+            ],
+            "★5 Hoàng Đế Xì Mi": [
+                { name: "Trả Lời Ta Đi, Các Tí", base: 4, coin: "+4", count: 2},
+                { name: "Tử Tử Đơn Thân: Xả Sinh Thủ Viên", base: 3, coin: "+3", count: 4},
+                { name: "Ta Sẽ Bảo Vệ Các Tí Trên Tất Cả Mọi Thứ Ta Có!", base: 23, coin: "-11", count: 1},
             ]
         };
 
@@ -1181,10 +1188,12 @@
             boan: { name: "Coăn Bọa", featured5Star: "★5 Coăn Bọa" },
             kieuluong: { name: "Kiều Lương tâm", featured5Star: "★5 Kiều Lương tâm" },
             ducanh: { name: "Phạm Đức Anh", featured5Star: "★5 Phạm Đức Anh" },
-            hieu: { name: "Ba Hĩu", featured5Star: "★5 Ba Hĩu" }
+            hieu: { name: "Ba Hĩu", featured5Star: "★5 Ba Hĩu" },
+            king: { name: "Hoàng Đế Xì Mi", featured5Star: "★5 Hoàng Đế Xì Mi"}
         };
 
         const hinhAnhVatPham = {
+            "★5 Hoàng Đế Xì Mi": "assets/images/Ximi.png",
             "★5 Nguyễn Minh Cường": "assets/images/cuong.jpg",
             "★5 Doom Mixing": "assets/images/doom.webp",
             "★5 Coăn Bọa": "assets/images/boan.webp",
@@ -1373,6 +1382,8 @@
                 } else if (danhSach5SaoNoRa.includes("★5 Kiều Lương tâm")) amThanh('klt.mp3');
                 else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
                     amThanh('stagger.mp3'); amThanh('roland.mp3');
+                } else if (danhSach5SaoNoRa.includes("★5 Hoàng Đế Xì Mi")) {
+                    amThanh('stagger.mp3'); amThanh('King.mp3');
                 } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); amThanh('Matthias.mp3'); }
                 
                 manHinhGacha.classList.add('flash-gold'); 
@@ -1497,6 +1508,9 @@
                 };
                 matthiasAudio.play().catch(e => console.log("Không thể phát Matthias.mp3"));
                 amThanh('muk.mp3');
+            } else if (tenNhanVat === "★5 Hoàng Đế Xì Mi") {
+                amThanh('stagger.mp3');
+                amThanh('King.mp3');
             }
 
             manHinhStatus.style.display = 'flex';
