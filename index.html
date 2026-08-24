@@ -1301,11 +1301,9 @@
 
         function rollItem() {
             pityCount++; 
-            let nolo5Sao = false;
+            let nolo5Sao = true; // Tỉ lệ 100% ra 5 sao
             let ngauNhien = Math.random() * 100;
             let isLech = false; 
-
-            if (pityCount >= 90 || ngauNhien <= 0.5) nolo5Sao = true;
 
             if (nolo5Sao) {
                 pityCount = 0; 
