@@ -1383,8 +1383,8 @@
                 else if (danhSach5SaoNoRa.includes("★5 Nguyễn Minh Cường")) {
                     amThanh('stagger.mp3'); amThanh('roland.mp3');
                 } else if (danhSach5SaoNoRa.includes("★5 Hoàng Đế Xì Mi")) {
-                    amThanh('stagger.mp3'); amThanh('King.mp3');
-                } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); amThanh('Matthias.mp3'); }
+                    amThanh('stagger.mp3'); amThanh('king.mp3');
+                } else { amThanh('stagger.mp3'); amThanh('muk.mp3'); amThanh('matthias.mp3'); }
                 
                 manHinhGacha.classList.add('flash-gold'); 
                 danhSach5SaoNoRa.forEach(ten5Sao => {
@@ -1496,20 +1496,19 @@
                 amThanh('klt.mp3');
             }else if (tenNhanVat === "★5 Hoàng Đế Xì Mi") {
                 amThanh('stagger.mp3');
-                amThanh('King.mp3');
+                amThanh('king.mp3');
             } else if (tenNhanVat === "★5 Nguyễn Minh Cường") {
                 amThanh('stagger.mp3'); 
                 amThanh('roland.mp3');
             } else if (tenNhanVat === "★5 Phạm Đức Anh") {
                 amThanh('stagger.mp3'); 
-                amThanh('Matthias.mp3'); 
-                let matthiasAudio = new Audio('assets/audio/Matthias.mp3');
+                let matthiasAudio = new Audio('assets/audio/matthias.mp3');
                 matthiasAudio.volume = amLuongTong * 0.5; // Bạn có thể chỉnh 0.5 thành mức khác tùy ý (từ 0.0 đến 1.0)
                 cacAmThanhDangPhat.push(matthiasAudio);
                 matthiasAudio.onended = function() {
-                cacAmThanhDangPhat = cacAmThanhDangPhat.filter(a => a !== matthiasAudio);
+                    cacAmThanhDangPhat = cacAmThanhDangPhat.filter(a => a !== matthiasAudio);
                 };
-                matthiasAudio.play().catch(e => console.log("Không thể phát Matthias.mp3"));
+                matthiasAudio.play().catch(e => console.log("Không thể phát matthias.mp3"));
                 amThanh('muk.mp3');
             } 
 
